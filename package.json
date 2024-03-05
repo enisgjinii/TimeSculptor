@@ -15,7 +15,13 @@
   },
   "dependencies": {
     "@google-cloud/local-auth": "^2.1.0",
+    "@paymoapp/active-window": "^2.0.6",
+    "@todesktop/client-get-app-icon": "^0.4.0",
     "active-win": "^8.1.1",
-    "googleapis": "^105.0.0"
+    "base64-img": "^1.0.4",
+    "find-process": "^1.4.7",
+    "get-installed-path": "^4.0.8",
+    "googleapis": "^105.0.0",
+    "icon-extractor": "^1.0.3"
   }
 }

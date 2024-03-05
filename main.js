@@ -1,41 +1,67 @@
-const { app, BrowserWindow, ipcMain, Tray, clipboard } = require("electron");
-const activeWin = require("active-win");
+const { app, BrowserWindow, ipcMain, Tray } = require("electron");
+const findProcess = require("find-process");
 const fs = require("fs");
+const path = require("path");
+const activeWin = require("active-win");
+
+function getFormattedDate(date) {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${month}-${day}-${year}`;
+}
+
 let mainWindow;
-let csvFilePath = "activity.csv";
+
+// Get current date
+const currentDate = new Date();
+// Format current date in mm-dd-yyyy format
+const formattedDate = getFormattedDate(currentDate);
+
+let csvFilePath = `activity_${formattedDate}.csv`;
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false, // Required to use ipcRenderer
+      contextIsolation: false,
     },
     icon: "logo.png",
   });
-  // Maximize the window to full-screen
+
   mainWindow.maximize();
   mainWindow.loadFile("index.html");
   mainWindow.on("closed", function () {
     mainWindow = null;
   });
+  console.log("Window created.");
 }
+
 function saveToCSV(data) {
-  fs.appendFile(csvFilePath, data + "\n", (err) => {
+  const currentTime = new Date().toLocaleTimeString(); // Format current time properly
+  const formattedData = `${currentTime},${data}`;
+  fs.appendFile(csvFilePath, formattedData + "\n", (err) => {
     if (err) {
       console.error("Error saving to CSV:", err);
+    } else {
+      console.log("Data successfully saved to CSV.");
     }
   });
 }
+
 async function sendActiveWindowInfo() {
   try {
     const activeWindow = await activeWin();
+    // console.log("Active Window:", activeWindow);
     const currentTime = new Date().toLocaleString();
-    // Extract only the application name from the owner property
     const applicationName = activeWindow.owner.name.split(" - ")[0];
+
     const data = `${currentTime},${applicationName}`;
     saveToCSV(data);
     mainWindow.webContents.send("activeWindow", data);
+    console.log("Active window information sent to renderer.");
   } catch (error) {
     console.error("Error retrieving active window:", error);
   }
@@ -46,33 +72,41 @@ function loadTimelineData() {
       console.error("Error reading CSV file:", err);
       return;
     }
-    console.log("Data from CSV:", data);
-    mainWindow.webContents.send("activeWindow", data);
-    // Parse the CSV data and send it line by line
-    const lines = data.split("\n");
-    lines.forEach((line) => {
-      mainWindow.webContents.send("activeWindow", line);
+    const lines = data.trim().split("\n");
+    const activities = lines.map((line) => {
+      const [time, application] = line.split(","); // Adjust for the correct position of time and application
+      return { time, application };
     });
+
+    mainWindow.webContents.send("loadTimelineData", activities);
+    console.log("Timeline data loaded successfully.");
   });
 }
+
 app.on("ready", () => {
   createWindow();
-  // Create tray icon
+  console.log("App is ready.");
+
   const appIcon = new Tray("logo.png");
-  // Send active window information every second
+  console.log("Tray icon created.");
+
   setInterval(sendActiveWindowInfo, 1000);
-  // Handle request to load timeline data
+
   ipcMain.on("loadTimeline", () => {
     loadTimelineData();
   });
 });
+
 app.on("window-all-closed", function () {
   if (process.platform !== "darwin") {
     app.quit();
+    console.log("App closed.");
   }
 });
+
 app.on("activate", function () {
   if (mainWindow === null) {
     createWindow();
+    console.log("Window recreated.");
   }
 });
