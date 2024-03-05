@@ -1,154 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TimeSculptor</title>
-  <!-- Tailwind CSS -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    /* Add any additional custom styles here */
-  </style>
-</head>
-<body class="font-sans antialiased bg-gray-100">
-  <div class="">
-    <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
-      <div id="timeline" class="mt-8 space-y-4 overflow-x-auto flex">
-        <canvas id="activityChart"></canvas>
-        <div id="workDaySummary"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Active Window Timeline</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .timeline {
+        display: flex;
+        flex-direction: column-reverse; /* Reverse to show latest activity at the top */
+        gap: 5px; /* Spacing between segments */
+      }
+      .activity {
+        color: white;
+        font-weight: bold;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+        margin-bottom: 5px;
+      }
+      .vscode {
+        background-color: #007acc;
+      } /* Visual Studio Code color */
+      .chrome {
+        background-color: #5cb85c;
+      } /* Google Chrome color */
+      .explorer {
+        background-color: #00a2e8;
+      } /* Windows Explorer color */
+      .whatsapp {
+        background-color: #25d366;
+      } /* WhatsApp color */
+      .notion {
+        background-color: #000;
+      } /* Notion color */
+      .outlook {
+        background-color: #0072c6;
+      } /* Outlook color */
+      .spotify {
+        background-color: #1db954;
+      } /* Spotify color */
+      .obs {
+        background-color: #C4C4C4;
+      } /* OBS color */
+      .todoist {
+        background-color: #db4a39;
+      } /* Todoist color */
+      .filezilla {
+        background-color: #bf9000;
+      } /* FileZilla color */
+      .discord {
+        background-color: #7289da;
+      } /* Discord color */
+      .github {
+        background-color: rgb(122, 36, 139);
+      }
+      .postman {
+        background-color: #ED6D3F;
+      } /* Postman color */
+      .other{
+        background-color: grey;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="mb-4">Active Window Timeline</h1>
+      <div class="input-group mb-3">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Search..."
+          id="searchInput"
+        />
       </div>
+      <div class="timeline" id="timeline"></div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script>
-      // JavaScript code to handle Google Calendar connection
-      document.getElementById("connectGoogleCalendar").addEventListener("click", function () {
-        // Write your code here to initiate connection with Google Calendar
-        alert("Connect with Google Calendar functionality will be implemented here.");
-      });
-    </script>
+
+    <!-- Bootstrap JavaScript (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       const { ipcRenderer } = require("electron");
+
       // Object to track time spent on each application
       const timeSpent = {};
-      // Declare chart variable globally to keep track of the chart instance
-      let activityChart;
+
       // Function to display active window timeline
       function displayTimeline(data) {
         const [, , application] = data.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+
         // Update time spent on the current application
         const trimmedApplication = application.trim(); // Trim application name
-        const currentTime = new Date();
-        const hour = currentTime.getHours();
-        if (!timeSpent[hour]) {
-          timeSpent[hour] = {};
+        if (trimmedApplication in timeSpent) {
+          timeSpent[trimmedApplication] += 1; // Increment time spent by 1 second
+        } else {
+          timeSpent[trimmedApplication] = 1; // Start counting time for new application
         }
-        if (!timeSpent[hour][trimmedApplication]) {
-          timeSpent[hour][trimmedApplication] = 0;
-        }
-        timeSpent[hour][trimmedApplication] += 1; // Increment time spent for this hour and application
+
         // Update the display
         updateTimeline();
-        updateWorkDaySummary(); // Update work day summary after updating timeline
       }
+
       // Function to update the timeline in the DOM
       function updateTimeline() {
-        const ctx = document.getElementById("activityChart").getContext("2d");
-        // Destroy previous chart instance if it exists
-        if (activityChart) {
-          activityChart.destroy();
-        }
-        const labels = [];
-        const data = [];
-        // Populate labels and data arrays
-        for (const hour in timeSpent) {
-          labels.push(hour);
-          const applications = timeSpent[hour];
-          let totalSeconds = 0;
-          for (const application in applications) {
-            totalSeconds += applications[application];
-          }
-          // Convert time spent from seconds to minutes
-          data.push(totalSeconds / 60);
-        }
-        // Create the chart
-        activityChart = new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels: labels,
-            datasets: [
-              {
-                label: "Time Spent (minutes)", // Update the label to reflect the unit change
-                data: data,
-                backgroundColor: "#4299e1",
-                borderColor: "#4299e1",
-                borderWidth: 1,
-              },
-            ],
-          },
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true,
-                title: {
-                  display: true,
-                  text: "Time (minutes)", // Update the y-axis label to reflect the unit change
-                },
-              },
-              x: {
-                title: {
-                  display: true,
-                  text: "Hour",
-                },
-              },
-            },
-          },
-        });
-      }
-      // Function to update the work day summary in the DOM
-      function updateWorkDaySummary() {
-        const workDaySummary = document.getElementById("workDaySummary");
-        workDaySummary.innerHTML = ""; // Clear previous data
-        // Display current date
-        const currentDate = new Date();
-        const formattedDate = currentDate.toDateString();
-        const dateElement = document.createElement("div");
-        dateElement.textContent = `Date: ${formattedDate}`;
-        dateElement.classList.add("mb-4", "text-gray-800");
-        workDaySummary.appendChild(dateElement);
-        // Initialize total focused and distracted time
-        let totalFocusedTime = 0;
-        let totalDistractedTime = 0;
-        // Calculate total time focused and distracted
-        for (const hour in timeSpent) {
-          const applications = timeSpent[hour];
-          for (const application in applications) {
-            if (applications[application] && !isNaN(applications[application])) {
-              totalFocusedTime += applications[application];
+        const timeline = document.getElementById("timeline");
+        timeline.innerHTML = ""; // Clear previous data
+
+        // Get search query
+        const searchInput = document
+          .getElementById("searchInput")
+          .value.trim()
+          .toLowerCase();
+
+        // Display time spent on each application as colored segments
+        for (const [application, time] of Object.entries(timeSpent)) {
+          // Filter segments based on search query and display only application name
+          if (application.toLowerCase().includes(searchInput)) {
+            const segment = document.createElement("div");
+
+            // Assign a class based on the application name for color
+            let colorClass;
+            switch (application) {
+              case "Visual Studio Code":
+                colorClass = "vscode";
+                break;
+              case "Google Chrome":
+                colorClass = "chrome";
+                break;
+              case "Windows Explorer":
+                colorClass = "explorer";
+                break;
+              case "WhatsApp":
+                colorClass = "whatsapp";
+                break;
+              case "Notion":
+                colorClass = "notion";
+                break;
+              case "Microsoft Outlook":
+                colorClass = "outlook";
+                break;
+              case "Spotify":
+                colorClass = "spotify";
+                break;
+              case "OBS Studio":
+                colorClass = "obs";
+                break;
+              case "Todoist":
+                colorClass = "todoist";
+                break;
+              case "filezilla.exe":
+                colorClass = "filezilla";
+                break;
+              case "Discord":
+                colorClass = "discord";
+                break;
+              case "GitHubDesktop.exe":
+                colorClass = "github";
+                break;
+              case "Postman":
+                colorClass = "postman";
+                break;
+              default:
+                colorClass = "other";
             }
+            segment.classList.add("activity", colorClass);
+
+            // Calculate minutes and seconds
+            const minutes = Math.floor(time / 60);
+            const seconds = time % 60;
+
+            // Set text content of the segment to display application name and time
+            segment.textContent = `${application}: ${minutes}m ${seconds}s`;
+
+            // Add the segment to the timeline
+            timeline.appendChild(segment);
           }
         }
-        // Convert seconds to minutes and hours for focused time
-        const focusedHours = Math.floor(totalFocusedTime / 3600);
-        const focusedMinutes = Math.floor((totalFocusedTime % 3600) / 60);
-        const focusedSeconds = totalFocusedTime % 60;
-        // Display time focused
-        const focusedTimeElement = document.createElement("div");
-        focusedTimeElement.textContent = `Focused Time: ${focusedHours}h ${focusedMinutes}m ${focusedSeconds}s`;
-        focusedTimeElement.classList.add("mb-2", "text-gray-800");
-        workDaySummary.appendChild(focusedTimeElement);
       }
+
       // Receive active window timeline from main process
       ipcRenderer.on("activeWindow", (event, data) => {
         displayTimeline(data);
       });
+
       // Load and display initial timeline when the window is loaded
       window.onload = () => {
         ipcRenderer.send("loadTimeline"); // Request to load timeline data
-        updateWorkDaySummary(); // Update work day summary on page load
       };
+
+      // Add event listener to search input for live search
+      document
+        .getElementById("searchInput")
+        .addEventListener("input", updateTimeline);
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
-</body>
+  </body>
 </html>
