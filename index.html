@@ -1,338 +1,296 @@
 <!DOCTYPE html>
 <html lang="sq">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Grafiku i Kohës së Fokusit</title>
-    <!-- Tailwind CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-      rel="stylesheet"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins&display=swap"
-      rel="stylesheet"
-    />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  </head>
-  <body
-    class="font-poppins bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white"
-  >
-    <div class="container mx-auto flex flex-col md:flex-row min-h-screen">
-      <div
-        class="sidebar md:w-64 bg-white dark:bg-gray-800 p-4 overflow-y-auto rounded-md shadow-lg m-4"
-      >
-        <!-- Sidebar Content Here -->
-        <div class="statistics mb-8">
-          <h2 class="text-lg font-semibold mb-4">Statistikat</h2>
-          <div class="starting-time">
-            <h3 class="text-sm font-medium text-gray-600">Koha e Fillimit</h3>
-            <div class="value text-gray-800" id="starting-time-value"></div>
-          </div>
-          <div class="most-time-spent mt-4">
-            <h3 class="text-sm font-medium text-gray-600">
-              Aplikacioni më i Përdorur
-            </h3>
-            <div class="value text-gray-800" id="most-time-spent-app"></div>
-          </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grafiku i Kohës së Fokusit</title>
+  <!-- Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+  <style>
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+
+<body class="font-poppins bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
+  <div class="container mx-auto flex flex-col md:flex-row min-h-screen">
+    <div class="sidebar md:w-64 bg-white dark:bg-gray-800 p-4 overflow-y-auto rounded-md shadow-lg m-4">
+      <!-- Sidebar Content Here -->
+      <div class="statistics mb-8">
+        <h2 class="text-lg font-semibold mb-4">Statistikat</h2>
+        <div class="starting-time">
+          <h3 class="text-sm font-medium text-gray-600">Koha e Fillimit</h3>
+          <div class="value text-gray-800" id="starting-time-value"></div>
         </div>
-      </div>
-      <div class="flex-grow">
-        <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
-          <ul
-            class="flex flex-wrap -mb-px text-sm font-medium text-center"
-            id="default-tab"
-            data-tabs-toggle="#default-tab-content"
-            role="tablist"
-          >
-            <li class="me-2" role="presentation">
-              <button
-                class="inline-block p-4 border-b-2 rounded-t-lg"
-                id="profile-tab"
-                data-tabs-target="#profile"
-                type="button"
-                role="tab"
-                aria-controls="profile"
-                aria-selected="false"
-              >
-                Timeline
-              </button>
-            </li>
-            <li class="me-2" role="presentation">
-              <button
-                class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-                id="dashboard-tab"
-                data-tabs-target="#dashboard"
-                type="button"
-                role="tab"
-                aria-controls="dashboard"
-                aria-selected="false"
-              >
-                Chart details
-              </button>
-            </li>
-            <li class="me-2" role="presentation">
-              <button
-                class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-                id="settings-tab"
-                data-tabs-target="#settings"
-                type="button"
-                role="tab"
-                aria-controls="settings"
-                aria-selected="false"
-              >
-                Settings
-              </button>
-            </li>
-            <li role="presentation">
-              <button
-                class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-                id="contacts-tab"
-                data-tabs-target="#contacts"
-                type="button"
-                role="tab"
-                aria-controls="contacts"
-                aria-selected="false"
-              >
-                Contacts
-              </button>
-            </li>
-          </ul>
-        </div>
-        <div id="default-tab-content">
-          <div
-            class="hidden p-4 rounded-lg bg-white dark:bg-gray-800"
-            id="profile"
-            role="tabpanel"
-            aria-labelledby="profile-tab"
-          >
-            <div id="timeline" class="timeline overflow-y-auto"></div>
-          </div>
-          <div
-            class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
-            id="dashboard"
-            role="tabpanel"
-            aria-labelledby="dashboard-tab"
-          >
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              This is some placeholder content the
-              <strong class="font-medium text-gray-800 dark:text-white"
-                >Dashboard tab's associated content</strong
-              >. Clicking another tab will toggle the visibility of this one for
-              the next. The tab JavaScript swaps classes to control the content
-              visibility and styling.
-            </p>
-          </div>
-          <div
-            class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
-            id="settings"
-            role="tabpanel"
-            aria-labelledby="settings-tab"
-          >
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              This is some placeholder content the
-              <strong class="font-medium text-gray-800 dark:text-white"
-                >Settings tab's associated content</strong
-              >. Clicking another tab will toggle the visibility of this one for
-              the next. The tab JavaScript swaps classes to control the content
-              visibility and styling.
-            </p>
-          </div>
-          <div
-            class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
-            id="contacts"
-            role="tabpanel"
-            aria-labelledby="contacts-tab"
-          >
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              This is some placeholder content the
-              <strong class="font-medium text-gray-800 dark:text-white"
-                >Contacts tab's associated content</strong
-              >. Clicking another tab will toggle the visibility of this one for
-              the next. The tab JavaScript swaps classes to control the content
-              visibility and styling.
-            </p>
-          </div>
+        <div class="most-time-spent mt-4">
+          <h3 class="text-sm font-medium text-gray-600">
+            Aplikacioni më i Përdorur
+          </h3>
+          <div class="value text-gray-800" id="most-time-spent-app"></div>
         </div>
       </div>
     </div>
-    <!-- Bootstrap JavaScript Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      // Funksioni për të formatuar datën në formatin mm-dd-yyyy
-      function getFormattedDate(date) {
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        const year = date.getFullYear();
-        return `${month}-${day}-${year}`;
-      }
-      // Funksioni për të marrë dhe përditësuar të dhënat nga CSV
-      // Funksioni për të marrë dhe përditësuar të dhënat nga CSV
-      function fetchDataAndUpdate() {
-        // Marrja e datës së tanishme
-        const currentDate = new Date();
-        // Formatimi i datës së tanishme në formatin mm-dd-yyyy
-        const formattedDate = getFormattedDate(currentDate);
-        // Konstruktimi i URL-së së skedarit CSV bazuar në datën e tanishme
-        const csvFileUrl = `activity_${formattedDate}.csv`; // Sigurohuni që ky URL përputhet me konventën tuaj të emërimit të skedarit
-        fetch(csvFileUrl)
-          .then((response) => response.text())
-          .then((csvData) => {
-            Papa.parse(csvData, {
-              header: false, // Për asnjë krye (header) në skedarin CSV
-              skipEmptyLines: true,
-              complete: function (results) {
-                updateTimeline(results.data);
-                updateSidebar(results.data);
-                updateLineChart(results.data); // Call function to update the line chart
-              },
-            });
-          })
-          .catch((error) => {
-            console.error("Gabim në marrjen e të dhënave CSV:", error);
-          });
-      }
-      // Funksioni për të përditësuar grafikun kohor
-      function updateTimeline(data) {
-        const timelineElement = document.getElementById("timeline");
-        // Pastro përmbajtjen ekzistuese
-        timelineElement.innerHTML = "";
-        // Inicializimi i një objekti për të mbajtur kohëzgjatjet për çdo orë
-        const hourDurations = Array.from({ length: 24 }, () => 0); // Kohëzgjatjet për 24 orë
-        // Iterimi nëpër çdo rresht të të dhënave CSV
-        for (let i = 0; i < data.length - 1; i++) {
-          const row = data[i];
-          const timestamp = new Date(row[0] + " " + row[1]); // Kombinimi i kolonave të datës dhe kohës për të krijuar një shënim kohor
-          const hour = timestamp.getHours();
-          // Shtoni kohëzgjatjen në orën përkatëse
-          hourDurations[hour] += 1;
-        }
-        // Krijoni intervalin kohor për çdo orë dhe shtoni ato në grafik
-        for (let i = 0; i < hourDurations.length; i++) {
-          const hour = i;
-          const duration = hourDurations[i];
-          timelineElement.appendChild(createTimeSlot(hour, duration));
-        }
-      }
-      // Function to update the line chart with data
-      function updateLineChart(data) {
-        const labels = data.map((row) => row[0] + " " + row[1]);
-        const durations = data.map((row) => parseInt(row[3]));
-        const ctx = document.getElementById("lineChart").getContext("2d");
-        const lineChart = new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: labels,
-            datasets: [
-              {
-                label: "Durations",
-                data: durations,
-                fill: false,
-                borderColor: "rgb(75, 192, 192)",
-                tension: 0.1,
-              },
-            ],
-          },
-          options: {
-            scales: {
-              x: {
-                type: "time",
-                time: {
-                  unit: "hour",
-                  displayFormats: {
-                    hour: "MMM DD hA",
-                  },
-                },
-                title: {
-                  display: true,
-                  text: "Time",
-                },
-              },
-              y: {
-                title: {
-                  display: true,
-                  text: "Duration",
-                },
-              },
+    <div class="flex-grow">
+      <div class="mb-4  border-gray-200 dark:border-gray-700">
+        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-tab"
+          data-tabs-toggle="#default-tab-content" role="tablist">
+          <li class="me-2" role="presentation">
+            <button class="inline-block p-4 border-b-2 rounded-t-lg" id="profile-tab" data-tabs-target="#profile"
+              type="button" role="tab" aria-controls="profile" aria-selected="false">
+              Timeline
+            </button>
+          </li>
+          <li class="me-2" role="presentation">
+            <button
+              class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
+              id="dashboard-tab" data-tabs-target="#dashboard" type="button" role="tab" aria-controls="dashboard"
+              aria-selected="false">
+              Chart details
+            </button>
+          </li>
+          <li class="me-2" role="presentation">
+            <button
+              class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
+              id="settings-tab" data-tabs-target="#settings" type="button" role="tab" aria-controls="settings"
+              aria-selected="false">
+              Settings
+            </button>
+          </li>
+          <li role="presentation">
+            <button
+              class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
+              id="contacts-tab" data-tabs-target="#contacts" type="button" role="tab" aria-controls="contacts"
+              aria-selected="false">
+              Contacts
+            </button>
+          </li>
+        </ul>
+      </div>
+      <div id="default-tab-content">
+        <div class="hidden p-4 rounded-lg bg-white dark:bg-gray-800" id="profile" role="tabpanel"
+          aria-labelledby="profile-tab">
+          <div class="flex flex-col">
+            <p class="text-sm text-gray-500 dark:text-gray-400 mx-2
+            mb-3">Filter</p>
+            <div class="inline-flex rounded-md mx-2" role="group">
+              <button type="button" id="back-button"
+                class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                Back
+              </button>
+              <button type="button" id="today-button"
+                class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                Today
+              </button>
+
+              <button type="button" id="next-button"
+                class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-e border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                Next
+              </button>
+            </div>
+
+            <div id="timeline" class="timeline overflow-y-auto pr-4 w-full"></div>
+          </div>
+        </div>
+        <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="dashboard" role="tabpanel"
+          aria-labelledby="dashboard-tab">
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            This is some placeholder content the
+            <strong class="font-medium text-gray-800 dark:text-white">Dashboard tab's associated content</strong>.
+            Clicking another tab will toggle the visibility of this one for
+            the next. The tab JavaScript swaps classes to control the content
+            visibility and styling.
+          </p>
+        </div>
+        <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="settings" role="tabpanel"
+          aria-labelledby="settings-tab">
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            This is some placeholder content the
+            <strong class="font-medium text-gray-800 dark:text-white">Settings tab's associated content</strong>.
+            Clicking
+            another tab will toggle the visibility of this one for
+            the next. The tab JavaScript swaps classes to control the content
+            visibility and styling.
+          </p>
+        </div>
+        <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="contacts" role="tabpanel"
+          aria-labelledby="contacts-tab">
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            This is some placeholder content the
+            <strong class="font-medium text-gray-800 dark:text-white">Contacts tab's associated content</strong>.
+            Clicking
+            another tab will toggle the visibility of this one for
+            the next. The tab JavaScript swaps classes to control the content
+            visibility and styling.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Funksioni për të formatuar datën në formatin mm-dd-yyyy
+    function getFormattedDate(date) {
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const year = date.getFullYear();
+      return `${month}-${day}-${year}`;
+    }
+    let currentDate = new Date(); // Initialize currentDate as today's date
+
+    // Function to fetch and update data based on date
+    function fetchDataAndUpdate() {
+      // Format the date
+      const formattedDate = getFormattedDate(currentDate);
+      // Construct the URL for the CSV file based on the formatted date
+      const csvFileUrl = `activity_${formattedDate}.csv`;
+
+      fetch(csvFileUrl)
+        .then((response) => response.text())
+        .then((csvData) => {
+          Papa.parse(csvData, {
+            header: false,
+            skipEmptyLines: true,
+            complete: function (results) {
+              updateTimeline(results.data);
+              updateSidebar(results.data);
             },
-          },
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching CSV data:", error);
         });
+    }
+    // Function to update the timeline graph
+    function updateTimeline(data) {
+      const timelineElement = document.getElementById("timeline");
+      timelineElement.innerHTML = ""; // Clear previous data
+
+      // Inicializimi i një objekti për të mbajtur kohëzgjatjet për çdo orë
+      const hourDurations = Array.from({ length: 24 }, () => 0); // Kohëzgjatjet për 24 orë
+      // Iterimi nëpër çdo rresht të të dhënave CSV
+      for (let i = 0; i < data.length - 1; i++) {
+        const row = data[i];
+        const timestamp = new Date(row[0] + " " + row[1]); // Kombinimi i kolonave të datës dhe kohës për të krijuar një shënim kohor
+        const hour = timestamp.getHours();
+        // Shtoni kohëzgjatjen në orën përkatëse
+        hourDurations[hour] += 1;
       }
-      // Funksioni për të përditësuar kohën e fillimit dhe aplikacionin më të përdorur
-      function updateSidebar(data) {
-        const startingTimeValue = document.getElementById(
-          "starting-time-value"
-        );
-        const mostTimeSpentApp = document.getElementById("most-time-spent-app");
-        // Llogaritja e kohës së fillimit
-        const firstRow = data[0];
-        const startingTime = firstRow[0] + " " + firstRow[1];
-        startingTimeValue.textContent = startingTime;
-        // Llogaritja e aplikacionit më të përdorur
-        const appDurations = {};
-        for (let i = 0; i < data.length - 1; i++) {
-          const row = data[i];
-          const appName = row[2]; // Supozimi që emri i aplikacionit është në kolonën e tretë
-          appDurations[appName] = (appDurations[appName] || 0) + 1;
-        }
-        const mostTimeSpentAppName = Object.keys(appDurations).reduce((a, b) =>
-          appDurations[a] > appDurations[b] ? a : b
-        );
-        // Shfaqeni emrin për aplikacionin më të përdorur
-        mostTimeSpentApp.textContent = mostTimeSpentAppName;
+      // Krijoni intervalin kohor për çdo orë dhe shtoni ato në grafik
+      for (let i = 0; i < hourDurations.length; i++) {
+        const hour = i;
+        const duration = hourDurations[i];
+        timelineElement.appendChild(createTimeSlot(hour, duration));
       }
-      // Funksioni për të krijuar një interval kohor
-      function createTimeSlot(hour, duration) {
-        const minutes = Math.floor(duration / 60);
-        const seconds = duration % 60;
-        const formattedDuration = `${minutes} minuta ${seconds} sekonda`;
-        const timeSlot = document.createElement("div");
-        const progressBar = document.createElement("div");
-        // Set classes for styling the timeSlot
-        timeSlot.className = "flex items-center space-x-4 p-4";
-        // Create a progress bar to represent the tracked time
-        progressBar.className = "bg-green-500 w-4 rounded"; // Tailwind classes for a green background and rounded corners
-        progressBar.style.height = (duration / 60) * 100 + "%"; // Height of the progress bar proportional to the duration
-        // Append the progress bar to the timeslot container
-        timeSlot.appendChild(progressBar);
-        timeSlot.innerHTML = `
-        <div class="hour">${hour}:00</div>
-        <div class="spacer"></div>
-        <div class="duration">${formattedDuration}</div>
-    `;
-        // Add mouseover and mouseout events to display and hide activities at a specific time
-        timeSlot.addEventListener("mouseover", function () {
-          // Call a function to display activities at the specified time
-          displayActivities(hour);
+    }
+    // Function to update the line chart with data
+    function updateSidebar(data) {
+      const startingTimeValue = document.getElementById(
+        "starting-time-value"
+      );
+      const mostTimeSpentApp = document.getElementById("most-time-spent-app");
+      // Llogaritja e kohës së fillimit
+      const firstRow = data[0];
+      const startingTime = firstRow[0] + " " + firstRow[1];
+      startingTimeValue.textContent = startingTime;
+      // Llogaritja e aplikacionit më të përdorur
+      const appDurations = {};
+      for (let i = 0; i < data.length - 1; i++) {
+        const row = data[i];
+        const appName = row[2]; // Supozimi që emri i aplikacionit është në kolonën e tretë
+        appDurations[appName] = (appDurations[appName] || 0) + 1;
+      }
+      const mostTimeSpentAppName = Object.keys(appDurations).reduce((a, b) =>
+        appDurations[a] > appDurations[b] ? a : b
+      );
+      // Shfaqeni emrin për aplikacionin më të përdorur
+      mostTimeSpentApp.textContent = mostTimeSpentAppName;
+    }
+    function createTimeSlot(index, duration) {
+      const currentDate = new Date(); // Get the current date and time
+      const currentHour = currentDate.getHours(); // Get the current hour
+      const hour = index < 10 ? "0" + index : index; // Add leading zero if hour is single digit
+      const minutes = Math.floor(duration / 60);
+      const seconds = duration % 60;
+      const formattedDuration = `${minutes} min ${seconds} sec`;
+      const timeSlot = document.createElement("div");
+      const progressBarContainer = document.createElement("div");
+      const progressBar = document.createElement("div");
+      // Set classes for styling the timeSlot
+      timeSlot.className =
+        "mx-2 my-5 flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 space-x-8 rounded-lg shadow-md duration-300 transform"; // Added more Tailwind CSS classes for styling
+      timeSlot.id = `timeslot-${hour}`; // Assign an ID based on the hour
+      // Set classes for styling the progressBarContainer
+      progressBarContainer.className = "flex-grow flex items-center";
+      // Set classes for styling the progressBar
+      progressBar.className = "bg-green-500 h-2 rounded"; // Tailwind classes for a green background and rounded corners
+      progressBar.style.width = `${(duration / 3600) * 100}%`; // Width of the progress bar proportional to the duration within the hour
+      // Append the progress bar to the progressBarContainer
+      progressBarContainer.appendChild(progressBar);
+      // Set the inner HTML of the timeSlot, including the hour and formatted duration
+      timeSlot.innerHTML = `
+    <div class="hour text-lg font-medium ${index > currentHour ? "text-gray-400" : ""
+        }">${hour}:00</div>
+    <div class="duration text-sm">${formattedDuration}</div>`;
+      // Append the progressBarContainer to the timeSlot
+      timeSlot.appendChild(progressBarContainer);
+      // Hide the progressBarContainer if duration is zero
+      if (duration === 0) {
+        progressBarContainer.style.display = "none";
+      }
+      // Apply hover effect only if the time slot represents a past or current hour
+      if (index <= currentHour) {
+        timeSlot.classList.add("hover:shadow-sm");
+      }
+      return timeSlot;
+    }
+    // Function to handle back button click
+    document.getElementById("back-button").addEventListener("click", function () {
+      // Check if there's data available for the previous day
+      const yesterday = new Date(currentDate);
+      yesterday.setDate(currentDate.getDate() - 1);
+      const formattedYesterday = getFormattedDate(yesterday);
+      const csvFileUrl = `activity_${formattedYesterday}.csv`;
+
+      fetch(csvFileUrl)
+        .then((response) => {
+          // If data is available, allow going back
+          if (response.ok) {
+            currentDate.setDate(currentDate.getDate() - 1); // Set currentDate to previous day
+            fetchDataAndUpdate(); // Fetch and update data for the new date
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching CSV data for yesterday:", error);
         });
-        timeSlot.addEventListener("mouseout", function () {
-          // Clear activities when the user moves the cursor away from the specified time
-          clearActivityDisplay();
-        });
-        return timeSlot;
-      }
-      // Function to display activities at a specific time
-      function displayActivities(hour) {
-        // Here you should call a function to display activities at the specified time
-        // This could involve displaying a modal, a dropdown, or another element on the page to show activities at the specified time
-        // You can use AJAX to fetch activities from a data source and display them in a modal, dropdown, etc.
-        console.log(`Aktivitetet në orën ${hour}:00 do të shfaqen këtu.`);
-      }
-      // Function to clear the activity display
-      function clearActivityDisplay() {
-        // Here you should go and remove any element that has displayed activities
-        // This could involve removing a modal, a dropdown, or another element on the page that has displayed activities at the specified time
-        console.log("Fshirja e shfaqjes së aktiviteteve.");
-      }
-      // Initially fetch and update data and the timeline graph
-      fetchDataAndUpdate();
-      // Set the interval to periodically fetch and update data and the timeline graph (every 1 seconds)
-      setInterval(fetchDataAndUpdate, 1000);
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
-  </body>
+    });
+
+    // Function to handle today button click
+    document.getElementById("today-button").addEventListener("click", function () {
+      currentDate = new Date(); // Set currentDate to today's date
+      fetchDataAndUpdate(); // Fetch and update data for the new date
+    });
+
+    // Function to handle next button click
+    document.getElementById("next-button").addEventListener("click", function () {
+      // Since you haven't provided the logic to restrict future dates, I'll assume you want to allow going to future dates without restriction
+      currentDate.setDate(currentDate.getDate() + 1); // Set currentDate to next day
+      fetchDataAndUpdate(); // Fetch and update data for the new date
+    });
+
+
+    // Initial fetch and update for today's data
+    fetchDataAndUpdate();
+    // Set the interval to periodically fetch and update data and the timeline graph (every 1 seconds)
+    setInterval(fetchDataAndUpdate, 1000);
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+</body>
+
 </html>
