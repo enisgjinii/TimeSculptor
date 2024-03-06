@@ -1,8 +1,12 @@
 const { app, BrowserWindow, ipcMain, Tray } = require("electron");
-const findProcess = require("find-process");
 const fs = require("fs");
 const path = require("path");
 const activeWin = require("active-win");
+const { MongoClient } = require("mongodb");
+
+const mongodbUrl = "mongodb://localhost:27017"; // Change this to your MongoDB connection string
+const dbName = "activity_tracker"; // Change this to your MongoDB database name
+const collectionName = "activity"; // Change this to your collection name
 
 function getFormattedDate(date) {
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -10,6 +14,21 @@ function getFormattedDate(date) {
   const year = date.getFullYear();
   return `${month}-${day}-${year}`;
 }
+// Connect to MongoDB
+let db;
+(async function connectToMongoDB() {
+  try {
+    const client = new MongoClient(mongodbUrl, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    await client.connect();
+    console.log("Connected to MongoDB");
+    db = client.db(dbName);
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error);
+  }
+})();
 
 let mainWindow;
 
@@ -40,13 +59,44 @@ function createWindow() {
 }
 
 function saveToCSV(data) {
-  const currentTime = new Date().toLocaleTimeString(); // Format current time properly
-  const formattedData = `${currentTime},${data}`;
+  const currentTime = new Date();
+  let hours = currentTime.getHours();
+  if (hours < 10) {
+    hours = `0${hours}`;
+  }
+  const minutes = String(currentTime.getMinutes()).padStart(2, "0"); // Add leading zero if minute is a single digit
+  const seconds = String(currentTime.getSeconds()).padStart(2, "0"); // Add leading zero if second is a single digit
+
+  const formattedTime = `${hours}:${minutes}:${seconds}`;
+  const formattedData = `${formattedTime},${data}`;
+
   fs.appendFile(csvFilePath, formattedData + "\n", (err) => {
     if (err) {
       console.error("Error saving to CSV:", err);
     } else {
       console.log("Data successfully saved to CSV.");
+      console.log("Saved data:", formattedData);
+    }
+  });
+}
+function saveToMongoDB(dateTime, application) {
+  if (!db) {
+    console.error("MongoDB connection not established");
+    return;
+  }
+
+  // Split the date and time
+  const [date, time] = dateTime.split(", ");
+
+  // Create a JavaScript object with properties for date, time, and application
+  const document = { date, time, application };
+
+  // Insert the document into the MongoDB collection
+  db.collection(collectionName).insertOne(document, (err, result) => {
+    if (err) {
+      console.error("Error saving to MongoDB:", err);
+    } else {
+      console.log("Data successfully saved to MongoDB.");
     }
   });
 }
@@ -60,6 +110,8 @@ async function sendActiveWindowInfo() {
 
     const data = `${currentTime},${applicationName}`;
     saveToCSV(data);
+    // Save to MongoDB
+    saveToMongoDB(currentTime, applicationName);
     mainWindow.webContents.send("activeWindow", data);
     console.log("Active window information sent to renderer.");
   } catch (error) {

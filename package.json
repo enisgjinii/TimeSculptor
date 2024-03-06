@@ -24,6 +24,8 @@
     "get-installed-path": "^4.0.8",
     "googleapis": "^105.0.0",
     "icon-extractor": "^1.0.3",
+    "mongodb": "^6.4.0",
+    "mongoose": "^8.2.1",
     "stripe": "^14.19.0"
   }
 }

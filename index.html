@@ -18,122 +18,260 @@
       font-family: 'Poppins', sans-serif;
     }
   </style>
-  <script src="https://js.stripe.com/v3/"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 
 <body class="font-poppins bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
   <div class="container mx-auto flex flex-col md:flex-row min-h-screen">
-    <div class="sidebar md:w-64 bg-white dark:bg-gray-800 p-4 overflow-y-auto rounded-md shadow-lg m-4">
-      <!-- Sidebar Content Here -->
-      <div class="statistics mb-8">
-        <h2 class="text-lg font-semibold mb-4">Statistikat</h2>
-        <div class="starting-time">
-          <h3 class="text-sm font-medium text-gray-600">Koha e Fillimit</h3>
-          <div class="value text-gray-800" id="starting-time-value"></div>
-        </div>
-        <div class="most-time-spent mt-4">
-          <h3 class="text-sm font-medium text-gray-600">
-            Aplikacioni më i Përdorur
-          </h3>
-          <div class="value text-gray-800" id="most-time-spent-app"></div>
-        </div>
-      </div>
-    </div>
-    <div class="flex-grow">
-      <div class="mb-4  border-gray-200 dark:border-gray-700">
-        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-tab"
-          data-tabs-toggle="#default-tab-content" role="tablist">
-          <li class="me-2" role="presentation">
-            <button class="inline-block p-4 border-b-2 rounded-t-lg" id="profile-tab" data-tabs-target="#profile"
-              type="button" role="tab" aria-controls="profile" aria-selected="false">
-              Timeline
-            </button>
+    <button data-drawer-target="sidebar-multi-level-sidebar" data-drawer-toggle="sidebar-multi-level-sidebar"
+      aria-controls="sidebar-multi-level-sidebar" type="button"
+      class="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
+      <span class="sr-only">Open sidebar</span>
+      <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
+        xmlns="http://www.w3.org/2000/svg">
+        <path clip-rule="evenodd" fill-rule="evenodd"
+          d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z">
+        </path>
+      </svg>
+    </button>
+    <aside id="sidebar-multi-level-sidebar"
+      class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
+      aria-label="Sidebar">
+      <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+        <ul class="space-y-2 font-medium">
+          <li>
+            <a href="#"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <svg
+                class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
+                <path
+                  d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
+                <path
+                  d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
+              </svg>
+              <span class="ms-3">Dashboard</span>
+            </a>
           </li>
-          <li class="me-2" role="presentation">
-            <button
-              class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-              id="dashboard-tab" data-tabs-target="#dashboard" type="button" role="tab" aria-controls="dashboard"
-              aria-selected="false">
-              Chart details
+          <li>
+            <button type="button"
+              class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+              aria-controls="dropdown-example" data-collapse-toggle="dropdown-example">
+              <svg
+                class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
+                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 21">
+                <path
+                  d="M15 12a1 1 0 0 0 .962-.726l2-7A1 1 0 0 0 17 3H3.77L3.175.745A1 1 0 0 0 2.208 0H1a1 1 0 0 0 0 2h.438l.6 2.255v.019l2 7 .746 2.986A3 3 0 1 0 9 17a2.966 2.966 0 0 0-.184-1h2.368c-.118.32-.18.659-.184 1a3 3 0 1 0 3-3H6.78l-.5-2H15Z" />
+              </svg>
+              <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">E-commerce</span>
+              <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="m1 1 4 4 4-4" />
+              </svg>
             </button>
+            <ul id="dropdown-example" class="hidden py-2 space-y-2">
+              <li>
+                <a href="#"
+                  class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Products</a>
+              </li>
+              <li>
+                <a href="#"
+                  class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Billing</a>
+              </li>
+              <li>
+                <a href="#"
+                  class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Invoice</a>
+              </li>
+            </ul>
           </li>
-          <li class="me-2" role="presentation">
-            <button
-              class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-              id="settings-tab" data-tabs-target="#settings" type="button" role="tab" aria-controls="settings"
-              aria-selected="false">
-              Settings
-            </button>
+          <li>
+            <a href="#"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <svg
+                class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
+                <path
+                  d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z" />
+              </svg>
+              <span class="flex-1 ms-3 whitespace-nowrap">Kanban</span>
+              <span
+                class="inline-flex items-center justify-center px-2 ms-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300">Pro</span>
+            </a>
           </li>
-          <li role="presentation">
-            <button
-              class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-              id="contacts-tab" data-tabs-target="#contacts" type="button" role="tab" aria-controls="contacts"
-              aria-selected="false">
-              Contacts
+          <li>
+            <a href="#"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <svg
+                class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  d="m17.418 3.623-.018-.008a6.713 6.713 0 0 0-2.4-.569V2h1a1 1 0 1 0 0-2h-2a1 1 0 0 0-1 1v2H9.89A6.977 6.977 0 0 1 12 8v5h-2V8A5 5 0 1 0 0 8v6a1 1 0 0 0 1 1h8v4a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-4h6a1 1 0 0 0 1-1V8a5 5 0 0 0-2.582-4.377ZM6 12H4a1 1 0 0 1 0-2h2a1 1 0 0 1 0 2Z" />
+              </svg>
+              <span class="flex-1 ms-3 whitespace-nowrap">Inbox</span>
+              <span
+                class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">3</span>
+            </a>
+          </li>
+          <li>
+            <a href="#"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <svg
+                class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                <path
+                  d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z" />
+              </svg>
+              <span class="flex-1 ms-3 whitespace-nowrap">Users</span>
+            </a>
+          </li>
+          <li>
+            <a href="#"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <svg
+                class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
+                <path
+                  d="M17 5.923A1 1 0 0 0 16 5h-3V4a4 4 0 1 0-8 0v1H2a1 1 0 0 0-1 .923L.086 17.846A2 2 0 0 0 2.08 20h13.84a2 2 0 0 0 1.994-2.153L17 5.923ZM7 9a1 1 0 0 1-2 0V7h2v2Zm0-5a2 2 0 1 1 4 0v1H7V4Zm6 5a1 1 0 1 1-2 0V7h2v2Z" />
+              </svg>
+              <span class="flex-1 ms-3 whitespace-nowrap">Products</span>
+            </a>
+          </li>
+          <li>
+            <a href="#"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <svg
+                class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 16">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M1 8h11m0 0L8 4m4 4-4 4m4-11h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3" />
+              </svg>
+              <span class="flex-1 ms-3 whitespace-nowrap">Sign In</span>
+            </a>
+          </li>
+          <li>
+            <button id="theme-toggle" type="button"
+              class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+              <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+              </svg>
+              <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                  fill-rule="evenodd" clip-rule="evenodd"></path>
+              </svg>
             </button>
           </li>
         </ul>
-      </div>
-      <div id="default-tab-content">
-        <div class="hidden p-4 rounded-lg bg-white dark:bg-gray-800" id="profile" role="tabpanel"
-          aria-labelledby="profile-tab">
-          <div class="flex flex-col">
-            <p class="text-sm text-gray-500 dark:text-gray-400 mx-2
-            mb-3">Filter</p>
-            <div class="inline-flex rounded-md mx-2" role="group">
-              <button type="button" id="back-button"
-                class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
-                Back
-              </button>
-              <button type="button" id="today-button"
-                class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
-                Today
-              </button>
-
-              <button type="button" id="next-button"
-                class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-e border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
-                Next
-              </button>
-            </div>
-
-            <div id="timeline" class="timeline overflow-y-auto pr-4 w-full"></div>
+        <div id="dropdown-cta" class="p-4 mt-6 rounded-lg bg-blue-50 dark:bg-blue-900" role="alert">
+          <div class="flex items-center mb-3">
+            <span
+              class="bg-blue-100 text-blue-800 text-sm font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-blue-300 dark:text-blue-900">Info</span>
           </div>
+          <div class="value text-gray-800" id="most-time-spent-app"></div>
         </div>
-        <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="dashboard" role="tabpanel"
-          aria-labelledby="dashboard-tab">
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            This is some placeholder content the
-            <strong class="font-medium text-gray-800 dark:text-white">Dashboard tab's associated content</strong>.
-            Clicking another tab will toggle the visibility of this one for
-            the next. The tab JavaScript swaps classes to control the content
-            visibility and styling.
-          </p>
+      </div>
+    </aside>
+    <div class="p-4 w-full sm:ml-64">
+      <div class="flex-grow">
+        <div class="mb-4  border-gray-200 dark:border-gray-700">
+          <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-tab"
+            data-tabs-toggle="#default-tab-content" role="tablist">
+            <li class="me-2" role="presentation">
+              <button class="inline-block p-4 border-b-2 rounded-t-lg" id="profile-tab" data-tabs-target="#profile"
+                type="button" role="tab" aria-controls="profile" aria-selected="false">
+                Timeline
+              </button>
+            </li>
+            <li class="me-2" role="presentation">
+              <button
+                class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
+                id="dashboard-tab" data-tabs-target="#dashboard" type="button" role="tab" aria-controls="dashboard"
+                aria-selected="false">
+                Chart details
+              </button>
+            </li>
+            <li class="me-2" role="presentation">
+              <button
+                class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
+                id="settings-tab" data-tabs-target="#settings" type="button" role="tab" aria-controls="settings"
+                aria-selected="false">
+                Settings
+              </button>
+            </li>
+            <li role="presentation">
+              <button
+                class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
+                id="contacts-tab" data-tabs-target="#contacts" type="button" role="tab" aria-controls="contacts"
+                aria-selected="false">
+                Contacts
+              </button>
+            </li>
+          </ul>
         </div>
-        <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="settings" role="tabpanel"
-          aria-labelledby="settings-tab">
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            This is some placeholder content the
-            <strong class="font-medium text-gray-800 dark:text-white">Settings tab's associated content</strong>.
-            Clicking
-            another tab will toggle the visibility of this one for
-            the next. The tab JavaScript swaps classes to control the content
-            visibility and styling.
-          </p>
-        </div>
-        <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="contacts" role="tabpanel"
-          aria-labelledby="contacts-tab">
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            This is some placeholder content the
-            <strong class="font-medium text-gray-800 dark:text-white">Contacts tab's associated content</strong>.
-            Clicking
-            another tab will toggle the visibility of this one for
-            the next. The tab JavaScript swaps classes to control the content
-            visibility and styling.
-          </p>
+        <div id="default-tab-content">
+          <div class="hidden p-4 rounded-lg bg-white dark:bg-gray-800" id="profile" role="tabpanel"
+            aria-labelledby="profile-tab">
+            <div class="flex flex-col">
+              <p class="text-sm text-gray-500 dark:text-gray-400 mx-2
+                mb-3">Filter</p>
+              <div class="inline-flex rounded-md mx-2" role="group">
+                <button type="button" id="back-button"
+                  class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                  Back
+                </button>
+                <button type="button" id="today-button"
+                  class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-e border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                  Today
+                </button>
+                <button type="button" id="today-button"
+                  class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-e border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                  Today
+                </button>
+                <button type="button" id="next-button"
+                  class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-e border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                  Next
+                </button>
+              </div>
+              <div id="timeline" class="timeline overflow-y-auto pr-4"></div>
+            </div>
+          </div>
+          <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="dashboard" role="tabpanel"
+            aria-labelledby="dashboard-tab">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              <!-- HTML element to render the chart -->
+            <div id="chart"></div>
+
+            <div class="value text-gray-800" id="all-apps-container"></div>
+            </p>
+          </div>
+          <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="settings" role="tabpanel"
+            aria-labelledby="settings-tab">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              This is some placeholder content the
+              <strong class="font-medium text-gray-800 dark:text-white">Settings tab's associated content</strong>.
+              Clicking
+              another tab will toggle the visibility of this one for
+              the next. The tab JavaScript swaps classes to control the content
+              visibility and styling.
+            </p>
+          </div>
+          <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="contacts" role="tabpanel"
+            aria-labelledby="contacts-tab">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              This is some placeholder content the
+              <strong class="font-medium text-gray-800 dark:text-white">Contacts tab's associated content</strong>.
+              Clicking
+              another tab will toggle the visibility of this one for
+              the next. The tab JavaScript swaps classes to control the content
+              visibility and styling.
+            </p>
+          </div>
         </div>
       </div>
     </div>
+  </div>
   </div>
   <script>
     // Funksioni për të formatuar datën në formatin mm-dd-yyyy
@@ -144,16 +282,18 @@
       return `${month}-${day}-${year}`;
     }
     let currentDate = new Date(); // Initialize currentDate as today's date
-
-    // Function to fetch and update data based on date
     function fetchDataAndUpdate() {
       // Format the date
       const formattedDate = getFormattedDate(currentDate);
       // Construct the URL for the CSV file based on the formatted date
       const csvFileUrl = `activity_${formattedDate}.csv`;
-
       fetch(csvFileUrl)
-        .then((response) => response.text())
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.text();
+        })
         .then((csvData) => {
           Papa.parse(csvData, {
             header: false,
@@ -165,100 +305,186 @@
           });
         })
         .catch((error) => {
-          console.error("Error fetching CSV data:", error);
+          console.error("Error fetching or parsing CSV data:", error);
         });
     }
     // Function to update the timeline graph
     function updateTimeline(data) {
       const timelineElement = document.getElementById("timeline");
       timelineElement.innerHTML = ""; // Clear previous data
-
-      // Inicializimi i një objekti për të mbajtur kohëzgjatjet për çdo orë
-      const hourDurations = Array.from({ length: 24 }, () => 0); // Kohëzgjatjet për 24 orë
-      // Iterimi nëpër çdo rresht të të dhënave CSV
-      for (let i = 0; i < data.length - 1; i++) {
-        const row = data[i];
-        const timestamp = new Date(row[0] + " " + row[1]); // Kombinimi i kolonave të datës dhe kohës për të krijuar një shënim kohor
+      const hourDurations = Array.from({ length: 24 }, () => 0); // Initialize durations for 24 hours
+      // Process data entries
+      data.forEach(row => {
+        const timestamp = new Date(`${row[0]} ${row[1]}`);
         const hour = timestamp.getHours();
-        // Shtoni kohëzgjatjen në orën përkatëse
-        hourDurations[hour] += 1;
-      }
-      // Krijoni intervalin kohor për çdo orë dhe shtoni ato në grafik
-      for (let i = 0; i < hourDurations.length; i++) {
-        const hour = i;
-        const duration = hourDurations[i];
-        timelineElement.appendChild(createTimeSlot(hour, duration));
-      }
+        hourDurations[hour] += 1; // Assuming each entry represents 1 minute of usage
+      });
+      // Create and append time slots
+      hourDurations.forEach((duration, hour) => {
+        const timeSlot = createTimeSlot(hour, duration);
+        timelineElement.appendChild(timeSlot);
+      });
     }
-    // Function to update the line chart with data
-    function updateSidebar(data) {
-      const startingTimeValue = document.getElementById(
-        "starting-time-value"
-      );
+    // Function to update the sidebar with app usage information
+    function updateSidebar() {
       const mostTimeSpentApp = document.getElementById("most-time-spent-app");
-      // Llogaritja e kohës së fillimit
-      const firstRow = data[0];
-      const startingTime = firstRow[0] + " " + firstRow[1];
-      startingTimeValue.textContent = startingTime;
-      // Llogaritja e aplikacionit më të përdorur
-      const appDurations = {};
-      for (let i = 0; i < data.length - 1; i++) {
-        const row = data[i];
-        const appName = row[2]; // Supozimi që emri i aplikacionit është në kolonën e tretë
-        appDurations[appName] = (appDurations[appName] || 0) + 1;
-      }
-      const mostTimeSpentAppName = Object.keys(appDurations).reduce((a, b) =>
-        appDurations[a] > appDurations[b] ? a : b
-      );
-      // Shfaqeni emrin për aplikacionin më të përdorur
-      mostTimeSpentApp.textContent = mostTimeSpentAppName;
+      const allAppsContainer = document.getElementById("all-apps-container");
+      // Make a request to the server to fetch the most used app
+      fetch("http://localhost:3000/most_used_app")
+        .then(response => response.json())
+        .then(data => {
+          // Check if data contains the most used app and its total usage
+          if (data.application && data.totalUsage) {
+            // Extract hours, minutes, and seconds from the totalUsage object
+            const { hours, minutes, seconds } = data.totalUsage;
+            // Format the total usage time as a string
+            const totalUsageString = `${hours} orë, ${minutes} minuta, ${seconds} sekonda`;
+            // Format the text content to display both the application and total usage
+            mostTimeSpentApp.innerHTML = `
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Most Used App</h3>
+          <div class="mt-4">
+            <p class="text-sm font-normal text-gray-600 dark:text-white">Aplikacioni: ${data.application}</p>
+            <p class="text-sm font-normal text-gray-600 dark:text-white">Përdorimi Total: ${totalUsageString}</p>
+          </div>
+        `;
+          } else {
+            // If data is incomplete or missing, display an error message
+            mostTimeSpentApp.textContent = "Gabim: Të dhënat janë të paimplementuara për aplikacionin më të përdorur";
+          }
+        })
+        .catch(error => {
+          console.error("Gabim në marrjen e aplikacionit më të përdorur:", error);
+          mostTimeSpentApp.textContent = "Gabim në marrjen e të dhënave për aplikacionin më të përdorur";
+        });
     }
-    function createTimeSlot(index, duration) {
+    fetch("http://localhost:3000/all_applications")
+      .then(response => response.json())
+      .then(data => {
+        // Filter out applications with more than 5 minutes spent
+        const filteredData = data.filter(app => {
+          const totalSeconds = app.totalUsage.hours * 3600 + app.totalUsage.minutes * 60 + app.totalUsage.seconds;
+          return totalSeconds > 300; // 300 seconds = 5 minutes
+        });
+
+        const labels = filteredData.map(app => app._id);
+        const usageData = filteredData.map(app => {
+          const totalSeconds = app.totalUsage.hours * 3600 + app.totalUsage.minutes * 60 + app.totalUsage.seconds;
+          return totalSeconds;
+        });
+
+        const options = {
+          chart: {
+            type: 'bar',
+            height: 350
+          },
+          plotOptions: {
+
+            bar: {
+              horizontal: false,
+              columnWidth: '55%',
+              borderRadius: 5,
+              dataLabels: {
+                position: 'top', // top, center, bottom
+              },
+            },
+          },
+          dataLabels: {
+            enabled: false
+          },
+          series: [{
+            name: 'Total Usage (Seconds)',
+            data: usageData
+          }],
+          xaxis: {
+            categories: labels,
+            labels: {
+              formatter: function (value) {
+                return value; // You can customize label formatting here if needed
+              }
+            }
+          },
+          yaxis: {
+            title: {
+              text: 'Total Usage (Seconds)'
+            }
+          },
+          tooltip: {
+            y: {
+              formatter: function (value) {
+                const hours = Math.floor(value / 3600);
+                const minutes = Math.floor((value % 3600) / 60);
+                const seconds = value % 60;
+                return `${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+              }
+            }
+          }
+        };
+
+        const chart = new ApexCharts(document.querySelector("#chart"), options);
+        chart.render();
+      })
+      .catch(error => {
+        console.error("Error fetching data:", error);
+      });
+    // add interval function
+    setInterval(updateSidebar, 5000);
+    function createTimeSlot(index, trackedDuration, idleDuration) {
       const currentDate = new Date(); // Get the current date and time
       const currentHour = currentDate.getHours(); // Get the current hour
-      const hour = index < 10 ? "0" + index : index; // Add leading zero if hour is single digit
-      const minutes = Math.floor(duration / 60);
-      const seconds = duration % 60;
-      const formattedDuration = `${minutes} min ${seconds} sec`;
+      // Convert 24-hour format to 12-hour format
+      const hour12 = index % 12 || 12; // Ensure 12 is displayed for 12:00 PM
+      const period = index < 12 ? 'AM' : 'PM';
+      const hour = hour12 < 10 ? "0" + hour12 : hour12;
+      const totalDuration = 3600; // Total duration in seconds
+      const idleDurationFormatted = totalDuration - trackedDuration < 0 ? 0 : totalDuration - trackedDuration;
+      const trackedMinutes = Math.floor(trackedDuration / 60);
+      const trackedSeconds = trackedDuration % 60;
+      const idleMinutes = Math.floor(idleDurationFormatted / 60);
+      const idleSeconds = idleDurationFormatted % 60;
       const timeSlot = document.createElement("div");
       const progressBarContainer = document.createElement("div");
-      const progressBar = document.createElement("div");
+      const trackedProgressBar = document.createElement("div");
+      const idleProgressBar = document.createElement("div");
       // Set classes for styling the timeSlot
       timeSlot.className =
-        "mx-2 my-5 flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 space-x-8 rounded-lg shadow-md duration-300 transform"; // Added more Tailwind CSS classes for styling
+        "mx-2 my-5 flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-800 space-x-8 rounded-lg dark:border-red duration-300 transform"; // Removed border classes
       timeSlot.id = `timeslot-${hour}`; // Assign an ID based on the hour
       // Set classes for styling the progressBarContainer
       progressBarContainer.className = "flex-grow flex items-center";
-      // Set classes for styling the progressBar
-      progressBar.className = "bg-green-500 h-2 rounded"; // Tailwind classes for a green background and rounded corners
-      progressBar.style.width = `${(duration / 3600) * 100}%`; // Width of the progress bar proportional to the duration within the hour
-      // Append the progress bar to the progressBarContainer
-      progressBarContainer.appendChild(progressBar);
-      // Set the inner HTML of the timeSlot, including the hour and formatted duration
-      timeSlot.innerHTML = `
-    <div class="hour text-lg font-medium ${index > currentHour ? "text-gray-400" : ""
-        }">${hour}:00</div>
-    <div class="duration text-sm">${formattedDuration}</div>`;
+      // Set classes for styling the trackedProgressBar
+      trackedProgressBar.className = "bg-green-500 h-2 rounded-lg mx-1"; // Tailwind classes for a green background and rounded corners
+      trackedProgressBar.style.width = `${(trackedDuration / totalDuration) * 100}%`; // Width of the tracked progress bar
+      // Set classes for styling the idleProgressBar
+      idleProgressBar.className = "bg-red-500 h-2 rounded-lg mx-1"; // Tailwind classes for a red background and rounded corners
+      idleProgressBar.style.width = `${(idleDurationFormatted / totalDuration) * 100}%`; // Width of the idle progress bar
+      // Append the progress bars to the progressBarContainer
+      progressBarContainer.appendChild(trackedProgressBar);
+      progressBarContainer.appendChild(idleProgressBar);
+      // Create a separate div for the time text with border
+      const timeText = document.createElement("div");
+      timeText.className = "hour text-lg p-2 rounded-lg font-medium ";
+      timeText.textContent = `${hour}:00 ${period}`;
+      // Apply border only to the time text
+      // Append the time text to the timeSlot
+      timeSlot.appendChild(timeText);
+      // Set the inner HTML of the timeSlot, including the formatted durations
+      timeSlot.innerHTML += `
+    <div class="duration text-sm">${trackedMinutes} min ${trackedSeconds} sec</div>
+    <div class="duration text-sm">${idleMinutes} min ${idleSeconds} sec</div>`;
       // Append the progressBarContainer to the timeSlot
       timeSlot.appendChild(progressBarContainer);
-      // Hide the progressBarContainer if duration is zero
-      if (duration === 0) {
-        progressBarContainer.style.display = "none";
-      }
       // Apply hover effect only if the time slot represents a past or current hour
       if (index <= currentHour) {
         timeSlot.classList.add("hover:shadow-sm");
       }
       return timeSlot;
     }
-    // Function to handle back button click
     document.getElementById("back-button").addEventListener("click", function () {
       // Check if there's data available for the previous day
       const yesterday = new Date(currentDate);
       yesterday.setDate(currentDate.getDate() - 1);
       const formattedYesterday = getFormattedDate(yesterday);
       const csvFileUrl = `activity_${formattedYesterday}.csv`;
-
       fetch(csvFileUrl)
         .then((response) => {
           // If data is available, allow going back
@@ -271,27 +497,64 @@
           console.error("Error fetching CSV data for yesterday:", error);
         });
     });
-
     // Function to handle today button click
     document.getElementById("today-button").addEventListener("click", function () {
       currentDate = new Date(); // Set currentDate to today's date
       fetchDataAndUpdate(); // Fetch and update data for the new date
     });
-
     // Function to handle next button click
     document.getElementById("next-button").addEventListener("click", function () {
       // Since you haven't provided the logic to restrict future dates, I'll assume you want to allow going to future dates without restriction
       currentDate.setDate(currentDate.getDate() + 1); // Set currentDate to next day
       fetchDataAndUpdate(); // Fetch and update data for the new date
     });
-
-
     // Initial fetch and update for today's data
     fetchDataAndUpdate();
     // Set the interval to periodically fetch and update data and the timeline graph (every 1 seconds)
     setInterval(fetchDataAndUpdate, 1000);
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+  <script>
+    // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+    var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+    // Change the icons inside the button based on previous settings
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      themeToggleLightIcon.classList.remove('hidden');
+    } else {
+      themeToggleDarkIcon.classList.remove('hidden');
+    }
+    var themeToggleBtn = document.getElementById('theme-toggle');
+    themeToggleBtn.addEventListener('click', function () {
+      // toggle icons inside button
+      themeToggleDarkIcon.classList.toggle('hidden');
+      themeToggleLightIcon.classList.toggle('hidden');
+      // if set via local storage previously
+      if (localStorage.getItem('color-theme')) {
+        if (localStorage.getItem('color-theme') === 'light') {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('color-theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('color-theme', 'light');
+        }
+        // if NOT set via local storage previously
+      } else {
+        if (document.documentElement.classList.contains('dark')) {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('color-theme', 'light');
+        } else {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('color-theme', 'dark');
+        }
+      }
+    });
+  </script>
 </body>
 
 </html>
