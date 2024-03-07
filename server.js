@@ -155,6 +155,9 @@ app.get("/all_applications", async (req, res) => {
           totalUsageSeconds: { $sum: 1 },
         },
       },
+      {
+        $sort: { totalUsageSeconds: -1 }, // Sort by totalUsageSeconds in descending order
+      },
     ]);
 
     if (allApps.length > 0) {
@@ -174,4 +177,63 @@ app.get("/all_applications", async (req, res) => {
     console.error("Error fetching all applications:", err);
     res.status(500).json({ error: "Failed to fetch all applications" });
   }
+});
+
+// Create a new route for calculating total usage for the actual date
+// Function to fetch and send total usage data
+async function sendTotalUsageData(res) {
+  const currentDate = new Date();
+  const formattedDate = `${
+    currentDate.getMonth() + 1
+  }/${currentDate.getDate()}/${currentDate.getFullYear()}`;
+
+  try {
+    const totalUsage = await Activity.aggregate([
+      {
+        $match: {
+          date: formattedDate,
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalUsageSeconds: { $sum: 1 }, // Sum up the total number of activities
+        },
+      },
+    ]);
+
+    if (totalUsage.length > 0) {
+      // Convert total usage from seconds to hours, minutes, and seconds
+      const formattedTotalUsage = convertSecondsToHMS(
+        totalUsage[0].totalUsageSeconds
+      );
+      res.json(formattedTotalUsage);
+    } else {
+      console.log("No activities found for the actual date");
+      res
+        .status(404)
+        .json({ error: "No activities found for the actual date" });
+    }
+  } catch (err) {
+    console.error("Error calculating total usage for the actual date:", err);
+    res
+      .status(500)
+      .json({ error: "Failed to calculate total usage for the actual date" });
+  }
+}
+
+// Route handler for /total_usage
+app.get("/total_usage", async (req, res) => {
+  // Send the total usage data immediately
+  sendTotalUsageData(res);
+
+  // Set up polling to send the total usage data every second
+  const intervalId = setInterval(() => {
+    sendTotalUsageData(res);
+  }, 1000);
+
+  // Clean up the interval when the client disconnects
+  req.on("close", () => {
+    clearInterval(intervalId);
+  });
 });
