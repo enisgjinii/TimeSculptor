@@ -760,11 +760,11 @@
     // Function to create pie chart
     async function createPieChart(date) {
       try {
-        // Check if a chart instance already exists
-        if (pieChart !== null) {
-          // If yes, destroy the existing chart
+        // Check if a chart instance already exists and destroy it if so
+        if (pieChart instanceof Chart) {
           pieChart.destroy();
         }
+
 
         // Fetch data from server
         const responseData = await fetchData(date);
@@ -790,7 +790,6 @@
             return 'red';
           }
         });
-        // Chart configuration
         const config = {
           type: 'doughnut',
           data: {
@@ -807,9 +806,10 @@
               },
               tooltip: {
                 callbacks: {
-                  label: function (context) {
-                    const label = labels[context.dataIndex];
-                    const value = data[context.dataIndex];
+                  label: context => {
+                    const { dataIndex } = context;
+                    const label = labels[dataIndex];
+                    const value = data[dataIndex];
                     const hours = Math.floor(value / 3600);
                     const minutes = Math.floor((value % 3600) / 60);
                     const seconds = value % 60;
@@ -818,8 +818,13 @@
                 }
               }
             },
+            animation: {
+              duration: 1000, // Animation duration in milliseconds
+              easing: 'easeInOutQuart' // Animation easing function
+            }
           }
         };
+
         // Get the canvas element
         const ctx = document.getElementById('pieChart').getContext('2d');
         // Create the pie chart and assign it to the pieChart variable
