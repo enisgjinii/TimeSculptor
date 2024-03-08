@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Summary Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <script>
+        // Function to format date to 'MM/DD/YYYY' format
+        function formatDate(date) {
+            const day = date.getDate();
+            const month = date.getMonth() + 1; // Months are zero-based
+            const year = date.getFullYear();
+            return `${month}/${day}/${year}`;
+        }
+
+        // Function to fetch total usage data
+        function fetchTotalUsage() {
+            const formattedDate = formatDate(new Date());
+            const url = `http://localhost:3000/total_usage?date=${formattedDate}`;
+            return fetch(url)
+                .then(response => response.json())
+                .catch(error => {
+                    console.error('Error fetching total usage:', error);
+                    return null;
+                });
+        }
+
+        // Function to update work hours in the HTML
+        function updateWorkHours() {
+            fetchTotalUsage().then(totalUsage => {
+                if (totalUsage) {
+                    const totalUsageParagraph = document.getElementById('totalUsage');
+                    totalUsageParagraph.textContent = ''; // Clear existing content
+
+                    // Calculate hours, minutes, and seconds
+                    const hours = Math.floor(totalUsage.hours);
+                    const minutes = Math.floor(totalUsage.minutes);
+                    const seconds = Math.floor(totalUsage.seconds);
+
+                    // Display formatted time
+                    totalUsageParagraph.textContent = `${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+                }
+            });
+        }
+
+        // Call the function immediately after defining it
+        updateWorkHours();
+    </script>
+</head>
+
+<body style="font-family: 'Poppins', sans-serif; color: #333; background-color: #f4f4f4; padding: 20px;">
+    <table
+        style="width: 100%; max-width: 600px; margin: auto; border-collapse: collapse; background-color: #ffffff; padding: 20px;">
+        <tr>
+            <td style="padding: 20px; text-align: center;">
+                <h2 style="color: #333;">Daily Summary Report</h2>
+                <p style="font-size: 18px; color: #555;">Friday, October 13</p>
+            </td>
+        </tr>
+        <!-- Work Hours -->
+        <tr>
+            <td id="workHours" style="padding: 10px 20px;">
+                <h3>Work Hours</h3>
+                <!-- Content will be dynamically updated here -->
+                <p><em>Work hours is your time spent in work categories and breaks. This is the most accurate depiction
+                        of how much time you spend at work for a day.</em></p>
+            </td>
+        </tr>
+        <!-- Breakdown -->
+        <tr>
+            <td style="padding: 10px 20px;">
+                <h3>Breakdown</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="text-align: left; padding-right: 10px;">PERCENT</th>
+                        <th style="text-align: right;">TOTAL TIME</th>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-right: 10px;">Focus</td>
+                        <td style="text-align: right;"> 19% - 17 min</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-right: 10px;">Meetings</td>
+                        <td style="text-align: right;">0% - 0 min</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-right: 10px;">Breaks</td>
+                        <td style="text-align: right;">20% - 18 min</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-right: 10px;">Other</td>
+                        <td style="text-align: right;">61% - 56 min</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <!-- Tracked Time -->
+        <tr>
+            <td style="padding: 10px 20px;">
+                <h3>Tracked Time</h3>
+                <p id="totalUsage"> <!-- Paragraph where total usage data will be displayed -->
+                    <!-- Content will be dynamically updated here -->
+                </p>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="width: 70%; text-align: left; padding-right: 10px;">Work categories</td>
+                        <td style="text-align: right;">97% - 1 hr 13 min</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-right: 10px;">Non-work categories</td>
+                        <td style="text-align: right;">3% - 2 min</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-right: 10px;">Total</td>
+                        <td style="text-align: right;">1 hr 15 min</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <!-- Categories -->
+        <tr>
+            <td style="padding: 10px 20px;">
+                <h3>Categories</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="width: 70%; text-align: left; padding-right: 10px;">Code</td>
+                        <td style="text-align: right;">74% - 56 min</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-right: 10px;">Messaging</td>
+                        <td style="text-align: right;">9% - 6 min</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-right: 10px;">Utility</td>
+                        <td style="text-align: right;">5% - 4 min</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-right: 10px;">Email</td>
+                        <td style="text-align: right;">3% - 2 min</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-right: 10px;">Miscellaneous</td>
+                        <td style="text-align: right;">9% - 8 min</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 20px; text-align: center;">
+                <p>Did you know that you can share your referral link below to give your friends one free month of Rize?
+                </p>
+                <a href="https://rize.io?utm_source=refer&code=061ADC&name=Enis+Gjini"
+                    style="color: #007bff; text-decoration: none;">https://rize.io?utm_source=refer&code=061ADC&name=Enis+Gjini</a>
+                <p>You will also receive one free month of TimeSculptor for each friend that becomes a paid subscriber.
+                </p>
+            </td>
+        </tr>
+        <!-- Footer -->
+        <tr>
+            <td style="padding: 20px; text-align: center; font-size: 14px; color: #999;">
+                <p>Review Your Day</p>
+                <p>Please feel free to email us directly if you have any questions or comments. Any feedback is greatly
+                    appreciated.</p>
+                <p>Regards,<br>Enis Gjini<br>Cofounder & CEO</p>
+                <p>This email was sent to you because you signed up for TimeSculptor.</p>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

@@ -64,3 +64,13 @@ Unlock the power of time management and productivity with TimeSculptor. Download
 ISC License
 
 For any questions or feedback, please contact [support@timesculptorapp.com](mailto:support@timesculptorapp.com). We're here to help you sculpt your time! ⏳🖥️
+
+
+
+<!-- const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "egjini17@gmail.com",
+        pass: "sytkrlipmducvmfy",
+      },
+    }); -->
