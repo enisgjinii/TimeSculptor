@@ -21,10 +21,7 @@ const Activity = mongoose.model("Activity", activitySchema);
 mongoose
   .connect(MONGODB_URI)
   .then(() => {
-    console.log("Successfully connected to MongoDB using Mongoose");
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
+    app.listen(PORT, () => {});
   })
   .catch((err) => {
     console.error("Failed to connect to MongoDB:", err);
@@ -33,11 +30,9 @@ app.get("/activities", async (req, res) => {
   try {
     // Fetch all activities without limiting for now
     const activities = await Activity.find();
-    console.log("Fetched activities:", activities);
     if (activities.length > 0) {
       res.json(activities); // Sending activities as API response
     } else {
-      console.log("No activities found");
       res.status(404).json({ error: "No activities found" });
     }
   } catch (err) {
@@ -84,7 +79,6 @@ app.get("/most_used_app", async (req, res) => {
       };
       res.json(result);
     } else {
-      console.log("No activities found for the current date");
       res
         .status(404)
         .json({ error: "No activities found for the current date" });
@@ -123,7 +117,6 @@ app.get("/most_used_app_yesterday", async (req, res) => {
     if (mostUsedApp.length > 0) {
       res.json(mostUsedApp[0]);
     } else {
-      console.log("No activities found for yesterday's date");
       res
         .status(404)
         .json({ error: "No activities found for yesterday's date" });
@@ -157,7 +150,6 @@ app.get("/all_applications", async (req, res) => {
       });
       res.json(formattedApps);
     } else {
-      console.log("No activities found");
       res.status(404).json({ error: "No activities found" });
     }
   } catch (err) {
@@ -165,6 +157,109 @@ app.get("/all_applications", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch all applications" });
   }
 });
+app.get("/applications_by_date/:date", async (req, res) => {
+  try {
+    // Parse the date parameter from the URL
+    const requestedDate = req.params.date;
+
+    // Convert the requested date to match the format in MongoDB (M/D/YYYY)
+    const [year, month, day] = requestedDate.split("-");
+    const mongoDBDateFormat = `${parseInt(month)}/${parseInt(day)}/${year}`;
+
+    // Query MongoDB using the converted date format
+    const applicationsByDate = await Activity.aggregate([
+      {
+        $match: {
+          date: mongoDBDateFormat,
+        },
+      },
+      {
+        $group: {
+          _id: "$application",
+          totalUsageSeconds: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { totalUsageSeconds: -1 }, // Sort by totalUsageSeconds in descending order
+      },
+    ]);
+
+    // Define categories
+    const categories = {
+      "Google Chrome": "Browsing",
+      "Mozilla Firefox": "Browsing",
+      "Microsoft Edge": "Browsing",
+      Safari: "Browsing",
+      Opera: "Browsing",
+      "Visual Studio Code": "Code",
+      "Sublime Text": "Code",
+      Atom: "Code",
+      "Notepad++": "Code",
+      Eclipse: "Code",
+      "IntelliJ IDEA": "Code",
+      NetBeans: "Code",
+      "Microsoft Word": "Documents",
+      "Microsoft Excel": "Documents",
+      "Microsoft PowerPoint": "Documents",
+      "LibreOffice Writer": "Documents",
+      "LibreOffice Calc": "Documents",
+      "LibreOffice Impress": "Documents",
+      "Adobe Photoshop": "Design",
+      "Adobe Illustrator": "Design",
+      "Adobe XD": "Design",
+      Sketch: "Design",
+      AutoCAD: "Design",
+      Blender: "Design",
+      GIMP: "Design",
+      Zoom: "Communication",
+      Skype: "Communication",
+      Slack: "Communication",
+      "Microsoft Teams": "Communication",
+      "WhatsApp.exe": "Communication",
+      Discord: "Communication",
+      Signal: "Communication",
+      Telegram: "Communication",
+      "Google Chat": "Communication",
+      Outlook: "Communication",
+      Notion: "Productivity",
+      "Notion Calendar": "Productivity",
+      Todoist: "Productivity",
+      "Microsoft Store": "Utility",
+      FileZilla: "Utility",
+      Postman: "Development",
+      "GitHub Desktop": "Development",
+      "File Explorer": "Utility",
+      "OBS Studio": "Media",
+      Spotify: "Media",
+      Viber: "Communication",
+      TimeSculptor: "Productivity",
+      MongoDBCompass: "Development",
+      // Add more categories and applications as needed
+    };
+
+    // Handle the response
+    if (applicationsByDate.length > 0) {
+      const formattedApps = applicationsByDate.map((app) => {
+        const { _id, totalUsageSeconds } = app;
+        const totalUsage = convertSecondsToHMS(totalUsageSeconds);
+
+        // Determine category based on application name
+        let category = categories[_id] || "Other";
+
+        return { application: _id, category, totalUsage };
+      });
+      res.json(formattedApps);
+    } else {
+      res
+        .status(404)
+        .json({ error: "No activities found for the specified date" });
+    }
+  } catch (err) {
+    console.error("Error fetching applications by date:", err);
+    res.status(500).json({ error: "Failed to fetch applications by date" });
+  }
+});
+
 // Route handler for /total_usage
 app.get("/total_usage", async (req, res) => {
   // Get the date query parameter from the request, default to today's date
@@ -192,7 +287,6 @@ app.get("/total_usage", async (req, res) => {
       );
       res.json(formattedTotalUsage);
     } else {
-      console.log("No activities found for the provided date");
       res
         .status(404)
         .json({ error: "No activities found for the provided date" });
@@ -388,15 +482,12 @@ app.post("/send-email", async (req, res) => {
     // Send email
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        console.log("Error sending email:", error);
         res.status(500).send("Error sending email");
       } else {
-        console.log("Email sent:", info.response);
         res.send("Email sent successfully");
       }
     });
   } catch (error) {
-    console.log("Failed to process the request:", error);
     res.status(500).send("Failed to process the request");
   }
 });

@@ -23,7 +23,6 @@ let db;
       useUnifiedTopology: true,
     });
     await client.connect();
-    console.log("Connected to MongoDB");
     db = client.db(dbName);
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
@@ -55,7 +54,6 @@ function createWindow() {
   mainWindow.on("closed", function () {
     mainWindow = null;
   });
-  console.log("Window created.");
 }
 
 function saveToCSV(data) {
@@ -74,8 +72,6 @@ function saveToCSV(data) {
     if (err) {
       console.error("Error saving to CSV:", err);
     } else {
-      console.log("Data successfully saved to CSV.");
-      console.log("Saved data:", formattedData);
     }
   });
 }
@@ -96,7 +92,6 @@ function saveToMongoDB(dateTime, application) {
     if (err) {
       console.error("Error saving to MongoDB:", err);
     } else {
-      console.log("Data successfully saved to MongoDB.");
     }
   });
 }
@@ -104,16 +99,17 @@ function saveToMongoDB(dateTime, application) {
 async function sendActiveWindowInfo() {
   try {
     const activeWindow = await activeWin();
-    // console.log("Active Window:", activeWindow);
+
     const currentTime = new Date().toLocaleString();
     const applicationName = activeWindow.owner.name.split(" - ")[0];
+    const title = activeWindow.title;
 
     const data = `${currentTime},${applicationName}`;
     saveToCSV(data);
     // Save to MongoDB
     saveToMongoDB(currentTime, applicationName);
     mainWindow.webContents.send("activeWindow", data);
-    console.log("Active window information sent to renderer.");
+    // title
   } catch (error) {
     console.error("Error retrieving active window:", error);
   }
@@ -131,16 +127,13 @@ function loadTimelineData() {
     });
 
     mainWindow.webContents.send("loadTimelineData", activities);
-    console.log("Timeline data loaded successfully.");
   });
 }
 
 app.on("ready", () => {
   createWindow();
-  console.log("App is ready.");
 
   const appIcon = new Tray("logo.png");
-  console.log("Tray icon created.");
 
   setInterval(sendActiveWindowInfo, 1000);
 
@@ -152,13 +145,11 @@ app.on("ready", () => {
 app.on("window-all-closed", function () {
   if (process.platform !== "darwin") {
     app.quit();
-    console.log("App closed.");
   }
 });
 
 app.on("activate", function () {
   if (mainWindow === null) {
     createWindow();
-    console.log("Window recreated.");
   }
 });
