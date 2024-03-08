@@ -213,6 +213,13 @@ app.post("/send-email", async (req, res) => {
       today.getMonth() + 1
     }/${today.getDate()}/${today.getFullYear()}`;
 
+    // Get the today in this format : Friday, October 13
+    const day = today.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+    });
+
     // Make a request to the /total_usage endpoint to get the total usage data for today
     const totalUsageResponse = await fetch(
       `http://localhost:3000/total_usage?date=${formattedDate}`
@@ -255,9 +262,11 @@ app.post("/send-email", async (req, res) => {
               style="width: 100%; max-width: 600px; margin: auto; border-collapse: collapse; background-color: #ffffff; padding: 20px;">
               <tr>
                   <td style="padding: 20px; text-align: center;">
-                      <h2 style="color: #333;">Daily Summary Report</h2>
-                      <p style="font-size: 18px; color: #555;">Friday, October 13</p>
-                  </td>
+                  <img src="cid:logo" width="100" height="100"/>  
+                  <p style="font-size: 20px; color: #555;">TimeSculptor</p>                    
+                  <h2 style="color: #333;">Daily Summary Report</h2>
+                  <p style="font-size: 18px; color: #555;">${day}</p>
+              </td>
               </tr>
               <!-- Work Hours -->
               <tr>
@@ -368,6 +377,13 @@ app.post("/send-email", async (req, res) => {
           </table>
       </body>
       </html>`,
+      attachments: [
+        {
+          filename: "logo.png",
+          path: "logo.png",
+          cid: "logo", //same cid value as in the html img src
+        },
+      ],
     };
     // Send email
     transporter.sendMail(mailOptions, (error, info) => {
