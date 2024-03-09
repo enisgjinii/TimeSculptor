@@ -19,9 +19,7 @@
     }
   </style>
   <style>
-
   </style>
-
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   <script src="https://kit.fontawesome.com/a1927a49ea.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.9/pdfmake.min.js"
@@ -30,6 +28,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.9/vfs_fonts.min.js"
     integrity="sha512-EFlschXPq/G5zunGPRSYqazR1CMKj0cQc8v6eMrQwybxgIbhsfoO5NAMQX3xFDQIbFlViv53o7Hy+yCWw6iZxA=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- Flatpickr CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <!-- Flatpickr JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/datepicker.min.js"></script>
 </head>
 
 <body class="font-poppins bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
@@ -184,7 +187,7 @@
         </div>
       </div>
     </aside>
-    <div class="p-4 w-full sm:ml-56">
+    <div class="p-4 w-full sm:ml-56 lg:ml-6">
       <div class="flex-grow">
         <div class="mb-4  border-gray-200 dark:border-gray-700">
           <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-tab"
@@ -226,7 +229,7 @@
             aria-labelledby="profile-tab">
             <div class="grid grid-cols-12 gap-4 divide-x divide-gray-200  dark:divide-gray-700">
               <!-- Column 1 -->
-              <div class="col-span-12 md:col-span-10">
+              <div class="col-span-12 md:col-span-9">
                 <div class="w-max">
                   <p id="totalUsage"
                     class="text-sm text-gray-500 dark:text-gray-400 ms-2 dark:text-white border dark:border-gray-700 rounded-lg p-3">
@@ -235,7 +238,7 @@
                 <div id="timeline" class="timeline overflow-y-auto pr-4"></div>
               </div>
               <!-- Column 2 -->
-              <div class="col-span-12 md:col-span-2 text-right">
+              <div class="col-span-12 md:col-span-3 text-right">
                 <div class="inline-flex rounded-md " role="group">
                   <button type="button" id="back-button"
                     class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
@@ -257,9 +260,37 @@
                     class="my-2 px-4 py-2.5 text-sm font-medium text-gray-900 bg-white border ms-1 rounded-lg border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
                     <i class="fa-regular fa-file"></i>
                   </button>
+                  <hr class="my-4 mx-2">
                   <div class="w-fit mx-auto ms-5">
                     <canvas id="pieChart" class="my-4 text-center"></canvas>
                   </div>
+                  <hr class="my-4 mx-2">
+                  <div class="flex items-center justify-between mx-3">
+                    <p class="text-left text-gray-800 mr-5">Most used</p>
+                    <div>
+                      <button id="showMoreButton" onclick="toggleShowMoreLess()"
+                        class="px-3 py-2 text-xs focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                        <i class="fa-solid fa-chevron-down"></i>
+                        Show More</button>
+                      <button id="showLessButton" onclick="toggleShowMoreLess()" style="display: none;"
+                        class="px-3 py-2 text-xs focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                        <i class="fa-solid fa-chevron-up"></i>
+                        Show Less</button>
+                    </div>
+                  </div>
+                  <ul id="mostUsed" class="text-left text-gray-500 mt-3 text-sm mx-3"></ul>
+                  <div class="flex items-center justify-between mx-3">
+                    <p class="text-left text-gray-800 mr-5">Most used categories</p>
+                  </div>
+                  <div class="flex items-center justify-between mx-2 my-3">
+                    <input id="startDate" name="start" type="text"
+                      class="bg-gray-100 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      placeholder="Start date">
+                    <input id="endDate" name="end" type="text"
+                      class="bg-gray-100 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-3 ml-2 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      placeholder="End date">
+                  </div>
+                  <ul id="mostUsedCategories" class="text-left text-gray-500 mt-3 text-sm mx-3"></ul>
                   <!-- Main modal -->
                   <div id="default-modal" tabindex="-1" aria-hidden="true"
                     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -720,7 +751,6 @@
   </script>
   <script>
     let currentDateForPieChart = new Date(); // This will keep track of the displayed date
-
     // Function to fetch data from server
     async function fetchData(date) {
       const dateObject = new Date(date);
@@ -729,7 +759,6 @@
         month: '2-digit',
         day: '2-digit'
       }).split('/').reverse().join('-'); // Reformat 'DD/MM/YYYY' to 'YYYY-MM-DD'
-
       try {
         const response = await fetch(`http://localhost:3000/applications_by_date/${formattedDate}`);
         if (!response.ok) {
@@ -742,7 +771,6 @@
         return []; // Return empty array or appropriate fallback
       }
     }
-
     // Function to format date as 'YYYY-MM-DD'
     function formatDate(date) {
       if (!(date instanceof Date)) {
@@ -753,10 +781,8 @@
       const day = String(date.getDate()).padStart(2, '0');
       return `${year}-${month}-${day}`;
     }
-
     // Declare a variable to hold the chart instance outside of the createPieChart function
     let pieChart = null;
-
     // Function to create pie chart
     async function createPieChart(date) {
       try {
@@ -764,8 +790,6 @@
         if (pieChart instanceof Chart) {
           pieChart.destroy();
         }
-
-
         // Fetch data from server
         const responseData = await fetchData(date);
         // Extract labels and data for the pie chart
@@ -801,6 +825,10 @@
           },
           options: {
             plugins: {
+              title: {
+                display: true,
+                text: 'Top 5 most used applications for ' + formatDate(currentDateForPieChart)
+              },
               legend: {
                 display: false // Hide legend
               },
@@ -818,13 +846,15 @@
                 }
               }
             },
+            layout: {
+              autoPadding: true
+            },
             animation: {
-              duration: 1000, // Animation duration in milliseconds
-              easing: 'easeInOutQuart' // Animation easing function
+              duration: 2000, // Animation duration in milliseconds
+              easing: 'linear' // Animation easing function
             }
           }
         };
-
         // Get the canvas element
         const ctx = document.getElementById('pieChart').getContext('2d');
         // Create the pie chart and assign it to the pieChart variable
@@ -833,28 +863,22 @@
         console.error('Error:', error);
       }
     }
-
     function getCurrentDate() {
       const now = new Date();
       return formatDate(now); // Simplified to directly return the formatted string
     }
-
     document.getElementById('back-button').addEventListener('click', () => {
       currentDateForPieChart.setDate(currentDateForPieChart.getDate() - 1); // Decrement the current date
       createPieChart(currentDateForPieChart);
     });
-
     document.getElementById('today-button').addEventListener('click', () => {
       currentDateForPieChart = new Date(); // Reset to today's date
       createPieChart(currentDateForPieChart);
     });
-
     document.getElementById('next-button').addEventListener('click', () => {
       currentDateForPieChart.setDate(currentDateForPieChart.getDate() + 1); // Increment the current date
       createPieChart(currentDateForPieChart);
     });
-
-
     // Function to format date as 'YYYY-MM-DD'
     function formatDate(date) {
       const year = date.getFullYear();
@@ -862,12 +886,168 @@
       const day = String(date.getDate()).padStart(2, '0');
       return `${year}-${month}-${day}`;
     }
-
     // Initialize chart with current date
     createPieChart(currentDateForPieChart); // Corrected to ensure date object is passed initially
   </script>
-
   <script src="api/get_total_usage.js"></script>
+  <script>
+    let currentDateForMostUsedApps = new Date();
+    let showAllApplications = false;
+    function formatDateForMostUsedApps(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    function displayLoadingIndicator() {
+      const mostUsed = document.getElementById('mostUsed');
+      mostUsed.innerHTML = '<li class="text-gray-500">Loading...</li>';
+    }
+    function displayErrorMessage(message) {
+      const mostUsed = document.getElementById('mostUsed');
+      mostUsed.innerHTML = `<li class="text-red-500">Error: ${message}</li>`;
+    }
+    function displayEmptyStateMessage() {
+      const mostUsed = document.getElementById('mostUsed');
+      mostUsed.innerHTML = '<li class="text-gray-500">No data available</li>';
+    }
+    function fetchDataAndRender() {
+      // Format the current date
+      const formattedDateForMostUsedApps = formatDateForMostUsedApps(currentDateForMostUsedApps);
+      // Make an AJAX request to fetch categories data
+      fetch(`http://localhost:3000/applications_by_date/${formattedDateForMostUsedApps}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch data');
+          }
+          return response.json();
+        })
+        .then(data => {
+          const mostUsed = document.getElementById('mostUsed');
+          mostUsed.innerHTML = '';
+          if (data.length === 0) {
+            displayEmptyStateMessage();
+            return;
+          }
+          // Sort applications based on usage time
+          data.sort((a, b) => {
+            const totalTimeA = a.totalUsage.hours * 3600 + a.totalUsage.minutes * 60 + a.totalUsage.seconds;
+            const totalTimeB = b.totalUsage.hours * 3600 + b.totalUsage.minutes * 60 + b.totalUsage.seconds;
+            return totalTimeB - totalTimeA;
+          });
+          // Limit display to the top 5 applications if not showing all
+          let displayedData = data;
+          if (!showAllApplications) {
+            displayedData = data.slice(0, 3);
+          }
+          // Calculate total usage duration for displayed applications only
+          const totalSeconds = displayedData.reduce((acc, curr) => {
+            const { hours, minutes, seconds } = curr.totalUsage;
+            return acc + (hours * 3600) + (minutes * 60) + seconds;
+          }, 0);
+          // Iterate over the fetched data and populate the list with application name and percentage
+          displayedData.forEach(app => {
+            const listItem = document.createElement('li');
+            listItem.classList.add('p-4', 'border', 'border-gray-300', 'rounded-lg', 'mb-6');
+            // Calculate percentage of total usage for the current application
+            const percentage = totalSeconds !== 0 ? ((app.totalUsage.hours * 3600) + (app.totalUsage.minutes * 60) + app.totalUsage.seconds) / totalSeconds * 100 : 0;
+            // Round percentage to two decimal places
+            const roundedPercentage = percentage.toFixed(2);
+            let iconUrl;
+            switch (app.application.toLowerCase()) {
+              case 'searchhost.exe':
+              case 'windows mobility center':
+              case 'windows shell experience host':
+              case 'lockapp.exe':
+              case 'windowsterminal.exe':
+              case 'application frame host':
+              case 'screenclippinghost.exe':
+              case 'pick an app':
+              case 'windows defender application':
+              case 'windows start experience host':
+                iconUrl = 'icons/windows-shell-experience-host.png';
+                break;
+              case 'githubdesktop.exe':
+                iconUrl = 'icons/github-desktop-exe.png';
+                break;
+              default:
+                iconUrl = `icons/${app.application.toLowerCase().replace(/ /g, '-')}.png`;
+                break;
+            }
+            const defaultIconUrl = 'icons/default.png';
+            const iconElement = document.createElement('img');
+            iconElement.classList.add('w-6', 'h-6', 'object-contain', 'mr-4');
+            iconElement.src = iconUrl;
+            iconElement.onerror = () => {
+              iconElement.src = defaultIconUrl;
+            };
+            const listItemContent = document.createElement('div');
+            listItemContent.classList.add('flex', 'items-center', 'justify-between');
+            const appInfo = document.createElement('div');
+            appInfo.classList.add('flex', 'items-center', 'space-x-2');
+            appInfo.appendChild(iconElement);
+            const appName = document.createElement('span');
+            appName.classList.add('text-gray-700', 'text-sm');
+            appName.textContent = app.application;
+            appInfo.appendChild(appName);
+            const percentageText = document.createElement('span');
+            percentageText.classList.add('text-gray-500', 'text-sm');
+            percentageText.textContent = `${roundedPercentage}%`;
+            const progressBarContainer = document.createElement('div');
+            progressBarContainer.classList.add('flex', 'items-center');
+            const progressBar = document.createElement('div');
+            progressBar.classList.add('flex', 'flex-grow', 'bg-gray-200', 'rounded-full', 'h-1.5', 'overflow-hidden', 'mt-3');
+            const progressFill = document.createElement('div');
+            progressFill.classList.add('bg-green-500', 'h-full');
+            progressFill.style.width = `${roundedPercentage}%`;
+            progressBar.appendChild(progressFill);
+            progressBarContainer.appendChild(progressBar);
+            listItemContent.appendChild(appInfo);
+            listItemContent.appendChild(percentageText);
+            listItem.appendChild(listItemContent);
+            listItem.appendChild(progressBarContainer);
+            // Append the list item to the categories list
+            mostUsed.appendChild(listItem);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching categories:', error);
+          displayErrorMessage(error.message);
+        });
+    }
+    function toggleShowMoreLess() {
+      const showMoreButton = document.getElementById('showMoreButton');
+      const showLessButton = document.getElementById('showLessButton');
+      if (showAllApplications) {
+        showMoreButton.style.display = 'inline-block';
+        showLessButton.style.display = 'none';
+        showAllApplications = false;
+        fetchDataAndRender();
+      } else {
+        showMoreButton.style.display = 'none';
+        showLessButton.style.display = 'inline-block';
+        showAllApplications = true;
+        fetchDataAndRender();
+      }
+    }
+    document.getElementById('back-button').addEventListener('click', () => {
+      currentDateForMostUsedApps.setDate(currentDateForMostUsedApps.getDate() - 1);
+      fetchDataAndRender();
+    });
+    document.getElementById('today-button').addEventListener('click', () => {
+      currentDateForMostUsedApps = new Date();
+      fetchDataAndRender();
+    });
+    document.getElementById('next-button').addEventListener('click', () => {
+      currentDateForMostUsedApps.setDate(currentDateForMostUsedApps.getDate() + 1);
+      fetchDataAndRender();
+    });
+    // Initially fetch and render data for today
+    fetchDataAndRender();
+    // Refresh data every 10 seconds
+    setInterval(fetchDataAndRender, 1000);
+  </script>
+  <script src="api/get_date_from_flatpickr.js"></script>
 </body>
 
 </html>

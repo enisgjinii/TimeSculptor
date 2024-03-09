@@ -161,11 +161,9 @@ app.get("/applications_by_date/:date", async (req, res) => {
   try {
     // Parse the date parameter from the URL
     const requestedDate = req.params.date;
-
     // Convert the requested date to match the format in MongoDB (M/D/YYYY)
     const [year, month, day] = requestedDate.split("-");
     const mongoDBDateFormat = `${parseInt(month)}/${parseInt(day)}/${year}`;
-
     // Query MongoDB using the converted date format
     const applicationsByDate = await Activity.aggregate([
       {
@@ -183,7 +181,6 @@ app.get("/applications_by_date/:date", async (req, res) => {
         $sort: { totalUsageSeconds: -1 }, // Sort by totalUsageSeconds in descending order
       },
     ]);
-
     // Define categories
     const categories = {
       "Google Chrome": "Browsing",
@@ -236,16 +233,13 @@ app.get("/applications_by_date/:date", async (req, res) => {
       MongoDBCompass: "Development",
       // Add more categories and applications as needed
     };
-
     // Handle the response
     if (applicationsByDate.length > 0) {
       const formattedApps = applicationsByDate.map((app) => {
         const { _id, totalUsageSeconds } = app;
         const totalUsage = convertSecondsToHMS(totalUsageSeconds);
-
         // Determine category based on application name
         let category = categories[_id] || "Other";
-
         return { application: _id, category, totalUsage };
       });
       res.json(formattedApps);
@@ -259,7 +253,133 @@ app.get("/applications_by_date/:date", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch applications by date" });
   }
 });
-
+app.get("/category_usage_by_date/:startDate/:endDate", async (req, res) => {
+  try {
+    // Parse the start and end dates from the URL
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    // Convert the requested dates to match the format in MongoDB (M/D/YYYY)
+    const [startYear, startMonth, startDay] = startDate.split("-");
+    const startMongoDBDateFormat = `${parseInt(startMonth)}/${parseInt(
+      startDay
+    )}/${startYear}`;
+    const [endYear, endMonth, endDay] = endDate.split("-");
+    const endMongoDBDateFormat = `${parseInt(endMonth)}/${parseInt(
+      endDay
+    )}/${endYear}`;
+    // Query MongoDB using the converted date format
+    const applicationsByDateRange = await Activity.aggregate([
+      {
+        $match: {
+          date: { $gte: startMongoDBDateFormat, $lte: endMongoDBDateFormat },
+        },
+      },
+      {
+        $group: {
+          _id: "$application",
+          totalUsageSeconds: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { totalUsageSeconds: -1 }, // Sort by totalUsageSeconds in descending order
+      },
+    ]);
+    const categories = {
+      "Google Chrome": "Browsing",
+      "Mozilla Firefox": "Browsing",
+      "Microsoft Edge": "Browsing",
+      Safari: "Browsing",
+      Opera: "Browsing",
+      "Visual Studio Code": "Code",
+      "Sublime Text": "Code",
+      Atom: "Code",
+      "Notepad++": "Code",
+      Eclipse: "Code",
+      "IntelliJ IDEA": "Code",
+      NetBeans: "Code",
+      "Microsoft Word": "Documents",
+      "Microsoft Excel": "Documents",
+      "Microsoft PowerPoint": "Documents",
+      "LibreOffice Writer": "Documents",
+      "LibreOffice Calc": "Documents",
+      "LibreOffice Impress": "Documents",
+      "Adobe Photoshop": "Design",
+      "Adobe Illustrator": "Design",
+      "Adobe XD": "Design",
+      Sketch: "Design",
+      AutoCAD: "Design",
+      Blender: "Design",
+      GIMP: "Design",
+      Zoom: "Communication",
+      Skype: "Communication",
+      Slack: "Communication",
+      "Microsoft Teams": "Communication",
+      "WhatsApp.exe": "Communication",
+      Discord: "Communication",
+      Signal: "Communication",
+      Telegram: "Communication",
+      "Google Chat": "Communication",
+      Outlook: "Communication",
+      Notion: "Productivity",
+      "Notion Calendar": "Productivity",
+      Todoist: "Productivity",
+      "Microsoft Store": "Utility",
+      FileZilla: "Utility",
+      Postman: "Development",
+      "GitHub Desktop": "Development",
+      "File Explorer": "Utility",
+      "OBS Studio": "Media",
+      Spotify: "Media",
+      Viber: "Communication",
+      TimeSculptor: "Productivity",
+      MongoDBCompass: "Development",
+      // Add more categories and applications as needed
+    };
+    // Helper function to format time
+    function formatTime(timeInSeconds) {
+      const hours = Math.floor(timeInSeconds / 3600);
+      const minutes = Math.floor((timeInSeconds % 3600) / 60);
+      const seconds = timeInSeconds % 60;
+      return { hours, minutes, seconds };
+    }
+    // Handle the response
+    if (applicationsByDateRange.length > 0) {
+      const categoryUsage = {};
+      applicationsByDateRange.forEach((app) => {
+        const { _id, totalUsageSeconds } = app;
+        // Determine category based on application name
+        const category = categories[_id] || "Other";
+        // Convert total usage seconds to hours, minutes, and seconds
+        const { hours, minutes, seconds } = formatTime(totalUsageSeconds);
+        // If the category doesn't exist in the result object, initialize it
+        if (!categoryUsage[category]) {
+          categoryUsage[category] = { hours, minutes, seconds };
+        } else {
+          // If the category already exists, accumulate the usage time
+          categoryUsage[category].hours += hours;
+          categoryUsage[category].minutes += minutes;
+          categoryUsage[category].seconds += seconds;
+        }
+      });
+      // Convert accumulated seconds to hours, minutes, and seconds
+      for (const category in categoryUsage) {
+        const { hours, minutes, seconds } = categoryUsage[category];
+        const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+        categoryUsage[category] = formatTime(totalSeconds);
+      }
+      res.json(categoryUsage);
+    } else {
+      res
+        .status(404)
+        .json({ error: "No activities found for the specified date range" });
+    }
+  } catch (err) {
+    console.error("Error fetching category usage by date range:", err);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch category usage by date range" });
+  }
+});
 // Route handler for /total_usage
 app.get("/total_usage", async (req, res) => {
   // Get the date query parameter from the request, default to today's date
@@ -300,32 +420,66 @@ app.get("/total_usage", async (req, res) => {
 });
 app.post("/send-email", async (req, res) => {
   try {
+    console.log("Received request to send email");
     // Create a Date object for today's date
     const today = new Date();
+    console.log("Today:", today);
     // Format today's date in the desired format (MM/DD/YYYY)
     const formattedDate = `${
       today.getMonth() + 1
     }/${today.getDate()}/${today.getFullYear()}`;
-
+    console.log("Formatted Date:", formattedDate);
     // Get the today in this format : Friday, October 13
     const day = today.toLocaleDateString("en-US", {
       weekday: "long",
       month: "long",
       day: "numeric",
     });
-
+    console.log("Day:", day);
     // Make a request to the /total_usage endpoint to get the total usage data for today
     const totalUsageResponse = await fetch(
       `http://localhost:3000/total_usage?date=${formattedDate}`
     );
+    if (!totalUsageResponse.ok) {
+      throw new Error(
+        `Failed to fetch total usage data. Status: ${totalUsageResponse.status}`
+      );
+    }
     const totalUsageData = await totalUsageResponse.json();
-
-    // Ensure that totalUsageData is not undefined
+    // Construct the start date dynamically as the current date
+    const startDate = new Date().toISOString().split("T")[0];
+    // Set the end date statically
+    const endDate = startDate;
+    // Make a request to the /category_usage_by_date endpoint to get the category usage data for the specified date range
+    const categoryUsageResponse = await fetch(
+      `http://localhost:${PORT}/category_usage_by_date/${startDate}/${endDate}`
+    );
+    if (!categoryUsageResponse.ok) {
+      throw new Error(
+        `Failed to fetch category usage data. Status: ${categoryUsageResponse.status}`
+      );
+    }
+    const categoryUsageData = await categoryUsageResponse.json();
+    console.log("Category Usage Data:", categoryUsageData);
+    // Log categories to the console
+    console.log("Categories:");
+    for (const category in categoryUsageData) {
+      console.log(category);
+    }
+    // Log each category with its usage
+    for (const category in categoryUsageData) {
+      console.log(`${category}:`, categoryUsageData[category]);
+    }
+    console.log("Total Usage Data:", totalUsageData);
+    console.log(typeof totalUsageData.hours, totalUsageData.hours);
+    console.log(typeof totalUsageData.minutes, totalUsageData.minutes);
+    console.log(typeof totalUsageData.seconds, totalUsageData.seconds);
+    // Ensure that totalUsageData is not undefined and properties exist
     if (
       !totalUsageData ||
-      !totalUsageData.hours ||
-      !totalUsageData.minutes ||
-      !totalUsageData.seconds
+      totalUsageData.hours === undefined ||
+      totalUsageData.minutes === undefined ||
+      totalUsageData.seconds === undefined
     ) {
       throw new Error("Total usage data is not available or is invalid");
     }
@@ -362,92 +516,34 @@ app.post("/send-email", async (req, res) => {
                   <p style="font-size: 18px; color: #555;">${day}</p>
               </td>
               </tr>
-              <!-- Work Hours -->
-              <tr>
-                  <td id="workHours" style="padding: 10px 20px;">
-                      <h3>Work Hours</h3>
-                      <!-- Content will be dynamically updated here -->
-                      <p><em>Work hours is your time spent in work categories and breaks. This is the most accurate depiction
-                              of how much time you spend at work for a day.</em></p>
-                  </td>
-              </tr>
-              <!-- Breakdown -->
-              <tr>
-                  <td style="padding: 10px 20px;">
-                      <h3>Breakdown</h3>
-                      <table style="width: 100%; border-collapse: collapse;">
-                          <tr>
-                              <th style="text-align: left; padding-right: 10px;">PERCENT</th>
-                              <th style="text-align: right;">TOTAL TIME</th>
-                          </tr>
-                          <tr>
-                              <td style="text-align: left; padding-right: 10px;">Focus</td>
-                              <td style="text-align: right;"> 19% - 17 min</td>
-                          </tr>
-                          <tr>
-                              <td style="text-align: left; padding-right: 10px;">Meetings</td>
-                              <td style="text-align: right;">0% - 0 min</td>
-                          </tr>
-                          <tr>
-                              <td style="text-align: left; padding-right: 10px;">Breaks</td>
-                              <td style="text-align: right;">20% - 18 min</td>
-                          </tr>
-                          <tr>
-                              <td style="text-align: left; padding-right: 10px;">Other</td>
-                              <td style="text-align: right;">61% - 56 min</td>
-                          </tr>
-                      </table>
-                  </td>
-              </tr>
               <!-- Tracked Time -->
               <tr>
                   <td style="padding: 10px 20px;">
                       <h3>Tracked Time</h3>
-                      <p>Total Usage: ${totalUsageData.hours} hours, ${totalUsageData.minutes} minutes, ${totalUsageData.seconds} seconds</p>
-                      <table style="width: 100%; border-collapse: collapse;">
-                          <tr>
-                              <td style="width: 70%; text-align: left; padding-right: 10px;">Work categories</td>
-                              <td style="text-align: right;">97% - 1 hr 13 min</td>
-                          </tr>
-                          <tr>
-                              <td style="text-align: left; padding-right: 10px;">Non-work categories</td>
-                              <td style="text-align: right;">3% - 2 min</td>
-                          </tr>
-                          <tr>
-                              <td style="text-align: left; padding-right: 10px;">Total</td>
-                              <td style="text-align: right;">1 hr 15 min</td>
-                          </tr>
-                      </table>
+                      <p>Total Usage: ${totalUsageData.hours} hours, ${
+        totalUsageData.minutes
+      } minutes, ${totalUsageData.seconds} seconds</p>
                   </td>
               </tr>
               <!-- Categories -->
-              <tr>
-                  <td style="padding: 10px 20px;">
-                      <h3>Categories</h3>
-                      <table style="width: 100%; border-collapse: collapse;">
-                          <tr>
-                              <td style="width: 70%; text-align: left; padding-right: 10px;">Code</td>
-                              <td style="text-align: right;">74% - 56 min</td>
-                          </tr>
-                          <tr>
-                              <td style="text-align: left; padding-right: 10px;">Messaging</td>
-                              <td style="text-align: right;">9% - 6 min</td>
-                          </tr>
-                          <tr>
-                              <td style="text-align: left; padding-right: 10px;">Utility</td>
-                              <td style="text-align: right;">5% - 4 min</td>
-                          </tr>
-                          <tr>
-                              <td style="text-align: left; padding-right: 10px;">Email</td>
-                              <td style="text-align: right;">3% - 2 min</td>
-                          </tr>
-                          <tr>
-                              <td style="text-align: left; padding-right: 10px;">Miscellaneous</td>
-                              <td style="text-align: right;">9% - 8 min</td>
-                          </tr>
-                      </table>
-                  </td>
-              </tr>
+<tr>
+    <td style="padding: 10px 20px;">
+        <h3>Categories</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+            <!-- Iterate over categoryUsageData and generate table rows -->
+            ${Object.entries(categoryUsageData)
+              .map(
+                ([category, usage]) => `
+            <tr>
+                <td style="width: 70%; text-align: left; padding-right: 10px;">${category}</td>
+                <td style="text-align: right;">${usage.hours} hours, ${usage.minutes} minutes</td>
+            </tr>
+            `
+              )
+              .join("")}
+        </table>
+    </td>
+</tr>
               <tr>
                   <td style="padding: 20px; text-align: center;">
                       <p>Did you know that you can share your referral link below to give your friends one free month of Rize?
@@ -482,12 +578,15 @@ app.post("/send-email", async (req, res) => {
     // Send email
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
+        console.error("Error sending email:", error);
         res.status(500).send("Error sending email");
       } else {
+        console.log("Email sent successfully:", info);
         res.send("Email sent successfully");
       }
     });
   } catch (error) {
+    console.error("Failed to process the request:", error);
     res.status(500).send("Failed to process the request");
   }
 });
