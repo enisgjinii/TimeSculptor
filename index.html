@@ -164,7 +164,7 @@
           </li>
           <li>
             <button id="theme-toggle" type="button"
-              class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+              class="w-full flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
               <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg">
                 <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
@@ -175,19 +175,20 @@
                   d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
                   fill-rule="evenodd" clip-rule="evenodd"></path>
               </svg>
+              <span class="flex-1 ms-3 whitespace-nowrap">Change</span>
             </button>
           </li>
         </ul>
-        <div id="dropdown-cta" class="p-4 mt-6 rounded-lg bg-blue-50 dark:bg-blue-900" role="alert">
+        <!-- <div id="dropdown-cta" class="p-4 mt-6 rounded-lg bg-blue-50 dark:bg-blue-900" role="alert">
           <div class="flex items-center mb-3">
             <span
               class="bg-blue-100 text-blue-800 text-sm font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-blue-300 dark:text-blue-900">Info</span>
           </div>
           <div class="value text-gray-800" id="most-time-spent-app"></div>
-        </div>
+        </div> -->
       </div>
     </aside>
-    <div class="p-4 w-full sm:ml-56 lg:ml-6">
+    <div class="p-4 w-full sm:ml-56 md:ml-64">
       <div class="flex-grow">
         <div class="mb-4  border-gray-200 dark:border-gray-700">
           <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-tab"
@@ -266,7 +267,7 @@
                   </div>
                   <hr class="my-4 mx-2">
                   <div class="flex items-center justify-between mx-3">
-                    <p class="text-left text-gray-800 mr-5">Most used</p>
+                    <p class="text-left text-gray-800 dark:text-gray-400 mr-5">Most used</p>
                     <div>
                       <button id="showMoreButton" onclick="toggleShowMoreLess()"
                         class="px-3 py-2 text-xs focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
@@ -280,16 +281,16 @@
                   </div>
                   <ul id="mostUsed" class="text-left text-gray-500 mt-3 text-sm mx-3"></ul>
                   <div class="flex items-center justify-between mx-3">
-                    <p class="text-left text-gray-800 mr-5">Most used categories</p>
+                    <p class="text-left text-gray-800 dark:text-gray-400 mr-5">Most used categories</p>
                   </div>
-                  <div class="flex items-center justify-between mx-2 my-3">
+                  <!-- <div class="flex items-center justify-between mx-2 my-3">
                     <input id="startDate" name="start" type="text"
                       class="bg-gray-100 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="Start date">
                     <input id="endDate" name="end" type="text"
                       class="bg-gray-100 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-3 ml-2 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="End date">
-                  </div>
+                  </div> -->
                   <ul id="mostUsedCategories" class="text-left text-gray-500 mt-3 text-sm mx-3"></ul>
                   <!-- Main modal -->
                   <div id="default-modal" tabindex="-1" aria-hidden="true"
@@ -384,6 +385,7 @@
     </div>
   </div>
   </div>
+  <script src="api/get_sidebar.js"></script>
   <script>
     // Funksioni për të formatuar datën në formatin mm-dd-yyyy
     function getFormattedDate(date) {
@@ -411,7 +413,7 @@
             skipEmptyLines: true,
             complete: function (results) {
               updateTimeline(results.data);
-              updateSidebar(results.data);
+              // updateSidebar(results.data);
             },
           });
         })
@@ -437,37 +439,6 @@
       });
     }
     // Function to update the sidebar with app usage information
-    function updateSidebar() {
-      const mostTimeSpentApp = document.getElementById("most-time-spent-app");
-      const allAppsContainer = document.getElementById("all-apps-container");
-      // Make a request to the server to fetch the most used app
-      fetch("http://localhost:3000/most_used_app")
-        .then(response => response.json())
-        .then(data => {
-          // Check if data contains the most used app and its total usage
-          if (data.application && data.totalUsage) {
-            // Extract hours, minutes, and seconds from the totalUsage object
-            const { hours, minutes, seconds } = data.totalUsage;
-            // Format the total usage time as a string
-            const totalUsageString = `${hours} orë, ${minutes} minuta, ${seconds} sekonda`;
-            // Format the text content to display both the application and total usage
-            mostTimeSpentApp.innerHTML = `
-          <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Most Used App</h3>
-          <div class="mt-4">
-            <p class="text-sm font-normal text-gray-600 dark:text-white">Aplikacioni: ${data.application}</p>
-            <p class="text-sm font-normal text-gray-600 dark:text-white">Përdorimi Total: ${totalUsageString}</p>
-          </div>
-        `;
-          } else {
-            // If data is incomplete or missing, display an error message
-            mostTimeSpentApp.textContent = "Gabim: Të dhënat janë të paimplementuara për aplikacionin më të përdorur";
-          }
-        })
-        .catch(error => {
-          console.error("Gabim në marrjen e aplikacionit më të përdorur:", error);
-          mostTimeSpentApp.textContent = "Gabim në marrjen e të dhënave për aplikacionin më të përdorur";
-        });
-    }
     // Disable the button initially
     document.getElementById("sendEmailButton").disabled = true;
     // Fetch chart data and render chart
@@ -578,7 +549,7 @@
         });
     }
     // add interval function
-    setInterval(updateSidebar, 5000);
+    // setInterval(updateSidebar, 5000);
     let totalTrackedMinutes = 0;
     let totalTrackedSeconds = 0;
     let totalIdleMinutes = 0;
@@ -948,7 +919,7 @@
           // Iterate over the fetched data and populate the list with application name and percentage
           displayedData.forEach(app => {
             const listItem = document.createElement('li');
-            listItem.classList.add('p-4', 'border', 'border-gray-300', 'rounded-lg', 'mb-6');
+            listItem.classList.add('p-4', 'border', 'border-gray-300', 'rounded-lg', 'mb-6', 'text-gray-800', 'dark:border-gray-700');
             // Calculate percentage of total usage for the current application
             const percentage = totalSeconds !== 0 ? ((app.totalUsage.hours * 3600) + (app.totalUsage.minutes * 60) + app.totalUsage.seconds) / totalSeconds * 100 : 0;
             // Round percentage to two decimal places
@@ -987,16 +958,16 @@
             appInfo.classList.add('flex', 'items-center', 'space-x-2');
             appInfo.appendChild(iconElement);
             const appName = document.createElement('span');
-            appName.classList.add('text-gray-700', 'text-sm');
+            appName.classList.add('text-gray-700', 'text-sm', 'dark:text-gray-400');
             appName.textContent = app.application;
             appInfo.appendChild(appName);
             const percentageText = document.createElement('span');
-            percentageText.classList.add('text-gray-500', 'text-sm');
+            percentageText.classList.add('text-gray-500', 'text-sm', 'dark:text-gray-400');
             percentageText.textContent = `${roundedPercentage}%`;
             const progressBarContainer = document.createElement('div');
             progressBarContainer.classList.add('flex', 'items-center');
             const progressBar = document.createElement('div');
-            progressBar.classList.add('flex', 'flex-grow', 'bg-gray-200', 'rounded-full', 'h-1.5', 'overflow-hidden', 'mt-3');
+            progressBar.classList.add('flex', 'flex-grow', 'bg-gray-200', 'rounded-full', 'h-1.5', 'overflow-hidden', 'mt-3', 'dark:bg-gray-600');
             const progressFill = document.createElement('div');
             progressFill.classList.add('bg-green-500', 'h-full');
             progressFill.style.width = `${roundedPercentage}%`;
