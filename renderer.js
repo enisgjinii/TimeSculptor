@@ -1,26 +1,41 @@
 window.onload = () => {
-    const backButton = document.getElementById('backButton');
-    const calendarButton = document.getElementById('calendarButton');
-    const nextButton = document.getElementById('nextButton');
-    const deleteButton = document.getElementById('deleteButton'); // New delete button
+    const buttons = [
+        { id: 'backButton', action: 'back' },
+        { id: 'calendarButton', action: 'calendar' },
+        { id: 'nextButton', action: 'next' },
+        { id: 'deleteButton', action: 'delete' } // New delete button
+    ];
 
     let backClickCount = 0;
-
-    backButton.addEventListener('click', () => {
-        backClickCount++;
-        fetchData(-backClickCount);
-    });
-
-    nextButton.addEventListener('click', () => {
-        if (backClickCount > 0) backClickCount--;
-        fetchData(-backClickCount); // Pass the negated value of backClickCount
-    });
-
     let calendarButtonClickedDate = null;
-    calendarButton.addEventListener('click', () => {
-        backClickCount = 0; // Reset back click count when calendar button is clicked
-        fetchData(0);
+
+    buttons.forEach(button => {
+        const element = document.getElementById(button.id);
+        if (element) {
+            element.addEventListener('click', () => handleButtonClick(button.action));
+        }
     });
+
+    async function handleButtonClick(action) {
+        switch (action) {
+            case 'back':
+                backClickCount++;
+                fetchData(-backClickCount);
+                break;
+            case 'next':
+                if (backClickCount > 0) backClickCount--;
+                fetchData(-backClickCount);
+                break;
+            case 'calendar':
+                backClickCount = 0;
+                fetchData(0);
+                break;
+            case 'delete':
+                // Handle delete button click
+                // You might need to pass specific parameters or context for delete action
+                break;
+        }
+    }
 
     async function fetchData(daysOffset) {
         try {
@@ -143,3 +158,5 @@ window.onload = () => {
         refreshTimeline();
     });
 };
+
+

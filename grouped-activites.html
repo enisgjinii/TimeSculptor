@@ -1,27 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Tracker</title>
+    <title>Grouped Activities</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
     <link rel='stylesheet'
         href='https://cdn-uicons.flaticon.com/2.3.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
     <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
     <style>
         ::-webkit-scrollbar {
             display: none;
         }
-
         * {
             font-family: 'General Sans', sans-serif;
-
         }
     </style>
 </head>
-
 <body>
     <nav class="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
         <div class="px-3 py-3 lg:px-5 lg:pl-3">
@@ -51,7 +48,7 @@
         <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
             <ul class="space-y-2 font-medium">
                 <li>
-                    <a href="#"
+                    <a href="index.html"
                         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
@@ -147,34 +144,12 @@
     </aside>
     <div class="p-4 sm:ml-64">
         <div class="p-4 border-2 border-gray-200 rounded-lg dark:border-gray-700 mt-14">
-            <div class="flex justify-between items-center mb-8">
-                <button id="refreshButton"
-                    class="flex items-center justify-center bg-white-500 text-dark px-2 py-1 rounded-lg border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-500 ease-in-out">
-                    <i class="fi fi-rr-refresh me-2"></i> Refresh Timeline
-                </button>
-                <div class="flex gap-1">
-                    <button id="backButton"
-                        class="bg-white-500 text-dark px-2 py-1 rounded-lg border-2 border-gray-200 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <i class="fi fi-rr-angle-left"></i>
-                    </button>
-                    <button id="calendarButton"
-                        class="bg-white-500 text-dark px-2 py-1 rounded-lg border-2 border-gray-200 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <i class="fi fi-rr-calendar-day"></i>
-                    </button>
-                    <button id="nextButton"
-                        class="bg-white-500 text-dark px-2 py-1 rounded-lg border-2 border-gray-200 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <i class="fi fi-rr-angle-right"></i>
-                    </button>
-                </div>
-            </div>
-            <ol class="relative border-s border-gray-200 dark:border-gray-700" id="activityList">
-            </ol>
+            <div id="calendar"></div>
         </div>
     </div>
     <h1>Active Application Tracker</h1>
     <div id="app-name">No active app yet</div>
-    <script src="renderer.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <script src="grouped-activities.js"></script>
 </body>
-
 </html>

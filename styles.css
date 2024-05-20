@@ -1,0 +1,28 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.activity-group {
+    margin-bottom: 20px;
+}
+
+.activity-sublist {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.activity-item {
+    margin-bottom: 5px;
+}
+
+.activity-title {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.activity-time {
+    margin-right: 10px;
+}

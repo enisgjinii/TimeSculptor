@@ -123,6 +123,46 @@ app.get('/activities/next', async (req, res) => {
     }
 });
 
+// Fetch all activities and group by processId with start and end times
+app.get('/grouped-activities', async (req, res) => {
+    try {
+        const activities = await ActiveApp.find().sort({ timestamp: 1 });
+        const groupedActivities = groupAndCalculateActivities(activities);
+        res.json(groupedActivities);
+    } catch (error) {
+        console.error('Error fetching grouped activities:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+function groupAndCalculateActivities(activities) {
+    const grouped = activities.reduce((acc, activity) => {
+        const processId = activity.owner.processId;
+        if (!acc[processId]) {
+            acc[processId] = [];
+        }
+        acc[processId].push(activity);
+        return acc;
+    }, {});
+
+    const result = Object.keys(grouped).map(processId => {
+        const activityGroup = grouped[processId];
+        return {
+            processId,
+            ownerName: activityGroup[0].owner.name,
+            start: activityGroup[0].timestamp,
+            end: activityGroup[activityGroup.length - 1].timestamp,
+            activities: activityGroup.map(activity => ({
+                title: activity.title,
+                timestamp: activity.timestamp,
+                memoryUsage: activity.memoryUsage
+            }))
+        };
+    });
+
+    return result;
+}
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
