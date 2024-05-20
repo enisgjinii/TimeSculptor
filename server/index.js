@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
 const PORT = process.env.PORT || 3000;
+
 // MongoDB Connection
 mongoose.connect('mongodb://localhost:27017/appData', {
     useNewUrlParser: true,
@@ -10,6 +11,7 @@ mongoose.connect('mongodb://localhost:27017/appData', {
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => console.log('Connected to MongoDB'));
+
 // Define Schema and Model for Active App Data
 const activeAppSchema = new mongoose.Schema({
     title: String,
@@ -31,11 +33,13 @@ const activeAppSchema = new mongoose.Schema({
     timestamp: { type: Date, default: Date.now }
 });
 const ActiveApp = mongoose.model('ActiveApp', activeAppSchema);
+
 // Routes
 app.use(express.json()); // Middleware to parse JSON request body
 app.get('/', (req, res) => {
     res.send('Express server is running!');
 });
+
 // Save Active App Data to MongoDB
 app.post('/active-app', async (req, res) => {
     const activeAppData = req.body;
@@ -43,7 +47,24 @@ app.post('/active-app', async (req, res) => {
     await newActiveApp.save();
     res.send('Active app data saved to MongoDB');
 });
-// Routes
+
+// Delete Active App Data from MongoDB by ID
+app.delete('/activities/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const deletedActivity = await ActiveApp.findByIdAndDelete(id);
+        if (deletedActivity) {
+            res.status(200).json({ message: 'Record deleted successfully' });
+        } else {
+            res.status(404).json({ error: 'Record not found' });
+        }
+    } catch (error) {
+        console.error('Error deleting record:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Fetch activities for a specific date
 app.get('/activities/:date', async (req, res) => {
     try {
         // Parse the date parameter from the request URL
@@ -67,6 +88,7 @@ app.get('/activities/:date', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 // Additional route to handle fetching activities for today
 app.get('/activities', async (req, res) => {
     try {
@@ -86,6 +108,7 @@ app.get('/activities', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 // Additional route to handle fetching activities for the next available date
 app.get('/activities/next', async (req, res) => {
     try {
@@ -99,6 +122,7 @@ app.get('/activities/next', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

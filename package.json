@@ -17,7 +17,8 @@
     "get-windows": "^9.1.1",
     "moment-timezone": "^0.5.45",
     "mongodb": "^6.6.2",
-    "mongoose": "^8.4.0"
+    "mongoose": "^8.4.0",
+    "sweetalert2": "^6.6.1"
   },
   "devDependencies": {
     "electron-reload": "^2.0.0-alpha.1"

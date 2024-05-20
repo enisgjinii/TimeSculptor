@@ -2,6 +2,7 @@ window.onload = () => {
     const backButton = document.getElementById('backButton');
     const calendarButton = document.getElementById('calendarButton');
     const nextButton = document.getElementById('nextButton');
+    const deleteButton = document.getElementById('deleteButton'); // New delete button
 
     let backClickCount = 0;
 
@@ -88,7 +89,36 @@ window.onload = () => {
             pOwner.textContent = `Owner: ${activity.owner.name}`;
             const space = document.createElement('span');
             space.textContent = ' ';
-            [time, space, date, h3, pOwner].forEach(el => li.appendChild(el));
+            const deleteBtn = document.createElement('button'); // Create delete button
+            deleteBtn.textContent = 'Delete'; // Set button text
+            deleteBtn.addEventListener('click', async () => { // Add event listener for delete button
+                try {
+                    const result = await Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'You will not be able to recover this record!',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!'
+                    });
+                    if (result.isConfirmed) {
+                        const response = await fetch(`http://localhost:3000/activities/${activity._id}`, {
+                            method: 'DELETE'
+                        });
+                        if (response.ok) {
+                            console.log('Record deleted successfully');
+                            // Refresh timeline after deletion
+                            refreshTimeline();
+                        } else {
+                            console.error('Failed to delete record:', response.statusText);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error deleting record:', error.message);
+                }
+            });
+            [time, space, date, h3, pOwner, deleteBtn].forEach(el => li.appendChild(el));
             activityList.appendChild(li);
         });
     }
