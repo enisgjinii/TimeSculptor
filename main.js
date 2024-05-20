@@ -1,155 +1,57 @@
-const { app, BrowserWindow, ipcMain, Tray } = require("electron");
-const fs = require("fs");
-const path = require("path");
-const activeWin = require("active-win");
-const { MongoClient } = require("mongodb");
-
-const mongodbUrl = "mongodb://localhost:27017"; // Change this to your MongoDB connection string
-const dbName = "activity_tracker"; // Change this to your MongoDB database name
-const collectionName = "activity"; // Change this to your collection name
-
-function getFormattedDate(date) {
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const year = date.getFullYear();
-  return `${month}-${day}-${year}`;
-}
-// Connect to MongoDB
-let db;
-(async function connectToMongoDB() {
-  try {
-    const client = new MongoClient(mongodbUrl, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    await client.connect();
-    db = client.db(dbName);
-  } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
-  }
-})();
-
-let mainWindow;
-
-// Get current date
-const currentDate = new Date();
-// Format current date in mm-dd-yyyy format
-const formattedDate = getFormattedDate(currentDate);
-
-let csvFilePath = `activity_${formattedDate}.csv`;
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
+const axios = require('axios');
+const electronReload = require('electron-reload');
 
 function createWindow() {
-  mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-    },
-    icon: "logo.png",
-  });
-
-  mainWindow.maximize();
-  mainWindow.loadFile("index.html");
-  mainWindow.on("closed", function () {
-    mainWindow = null;
-  });
-}
-
-function saveToCSV(data) {
-  const currentTime = new Date();
-  let hours = currentTime.getHours();
-  if (hours < 10) {
-    hours = `0${hours}`;
-  }
-  const minutes = String(currentTime.getMinutes()).padStart(2, "0"); // Add leading zero if minute is a single digit
-  const seconds = String(currentTime.getSeconds()).padStart(2, "0"); // Add leading zero if second is a single digit
-
-  const formattedTime = `${hours}:${minutes}:${seconds}`;
-  const formattedData = `${formattedTime},${data}`;
-
-  fs.appendFile(csvFilePath, formattedData + "\n", (err) => {
-    if (err) {
-      console.error("Error saving to CSV:", err);
-    } else {
-    }
-  });
-}
-function saveToMongoDB(dateTime, application) {
-  if (!db) {
-    console.error("MongoDB connection not established");
-    return;
-  }
-
-  // Split the date and time
-  const [date, time] = dateTime.split(", ");
-
-  // Create a JavaScript object with properties for date, time, and application
-  const document = { date, time, application };
-
-  // Insert the document into the MongoDB collection
-  db.collection(collectionName).insertOne(document, (err, result) => {
-    if (err) {
-      console.error("Error saving to MongoDB:", err);
-    } else {
-    }
-  });
-}
-
-async function sendActiveWindowInfo() {
-  try {
-    const activeWindow = await activeWin();
-
-    const currentTime = new Date().toLocaleString();
-    const applicationName = activeWindow.owner.name.split(" - ")[0];
-    const title = activeWindow.title;
-
-    const data = `${currentTime},${applicationName}`;
-    saveToCSV(data);
-    // Save to MongoDB
-    saveToMongoDB(currentTime, applicationName);
-    mainWindow.webContents.send("activeWindow", data);
-    // title
-  } catch (error) {
-    console.error("Error retrieving active window:", error);
-  }
-}
-function loadTimelineData() {
-  fs.readFile(csvFilePath, "utf8", (err, data) => {
-    if (err) {
-      console.error("Error reading CSV file:", err);
-      return;
-    }
-    const lines = data.trim().split("\n");
-    const activities = lines.map((line) => {
-      const [time, application] = line.split(","); // Adjust for the correct position of time and application
-      return { time, application };
+    const win = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js'),
+            nodeIntegration: true,
+            contextIsolation: true,
+        }
     });
+    // Remove the default menu
+    // win.setMenu(null);
+    win.loadFile('index.html');
 
-    mainWindow.webContents.send("loadTimelineData", activities);
-  });
+    // Maximize the window to full screen
+    win.maximize();
+
+    setInterval(async () => {
+        const { activeWindow } = await import('get-windows');
+        const activeWinInfo = await activeWindow();
+        if (activeWinInfo) {
+            console.log(activeWinInfo.owner.name);
+            console.log(activeWinInfo.url);
+            // Send active window info to Express.js server
+            try {
+                await axios.post('http://localhost:3000/active-app', activeWinInfo);
+                console.log('Data sent to server');
+            } catch (error) {
+                console.error('Error sending data to server:', error.message);
+            }
+            // Send active window info to renderer process
+            win.webContents.send('active-app', activeWinInfo.owner.name);
+        }
+    }, 1000);
 }
 
-app.on("ready", () => {
-  createWindow();
+// Enable hot reload
+electronReload(__dirname);
 
-  const appIcon = new Tray("logo.png");
+app.on('ready', createWindow);
 
-  setInterval(sendActiveWindowInfo, 1000);
-
-  ipcMain.on("loadTimeline", () => {
-    loadTimelineData();
-  });
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
 });
 
-app.on("window-all-closed", function () {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
-});
-
-app.on("activate", function () {
-  if (mainWindow === null) {
-    createWindow();
-  }
+app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+    }
 });

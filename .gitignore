@@ -1,7 +1,2 @@
-/activity.csv
+# Ignore all files and directories in the node_modules directory. 
 /node_modules
-activity_03-05-2024.csv
-*.csv
-activity_03-06-2024.csv
-activity_03-06-2024.csv
-activity_03-06-2024.csv
