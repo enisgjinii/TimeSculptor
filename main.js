@@ -28,7 +28,7 @@ function createWindow() {
             console.log(activeWinInfo.url);
             // Send active window info to Express.js server
             try {
-                await axios.post('http://localhost:3000/active-app', activeWinInfo);
+                await axios.post('http://localhost:3001/active-app', activeWinInfo);
                 console.log('Data sent to server');
             } catch (error) {
                 console.error('Error sending data to server:', error.message);

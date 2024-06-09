@@ -11,7 +11,7 @@ async function fetchAndRenderActivities() {
     if (fetchInProgress) return;
     fetchInProgress = true;
     try {
-        const response = await fetch('http://localhost:3000/grouped-activities');
+        const response = await fetch('http://localhost:3001/grouped-activities');
         if (!response.ok) {
             throw new Error(`Unable to fetch grouped activities. Status: ${response.status}`);
         }

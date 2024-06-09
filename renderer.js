@@ -42,7 +42,7 @@ window.onload = () => {
             const currentDate = new Date();
             currentDate.setDate(currentDate.getDate() + daysOffset);
             const formattedDate = currentDate.toISOString().split('T')[0];
-            const response = await fetch(`http://localhost:3000/activities/${formattedDate}`);
+            const response = await fetch(`http://localhost:3001/activities/${formattedDate}`);
             if (response.ok) {
                 const activities = await response.json();
                 console.log(`Data for the ${daysOffset === 0 ? 'selected' : daysOffset < 0 ? 'previous' : 'next'} date:`, activities);
@@ -69,7 +69,7 @@ window.onload = () => {
 
     async function fetchActivities() {
         try {
-            const response = await fetch('http://localhost:3000/activities');
+            const response = await fetch('http://localhost:3001/activities');
             if (!response.ok) {
                 throw new Error('Failed to fetch activities');
             }
@@ -118,7 +118,7 @@ window.onload = () => {
                         confirmButtonText: 'Yes, delete it!'
                     });
                     if (result.isConfirmed) {
-                        const response = await fetch(`http://localhost:3000/activities/${activity._id}`, {
+                        const response = await fetch(`http://localhost:3001/activities/${activity._id}`, {
                             method: 'DELETE'
                         });
                         if (response.ok) {
